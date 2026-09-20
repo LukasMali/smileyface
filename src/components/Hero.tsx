@@ -37,7 +37,7 @@ export function Hero() {
           made for one very sweet human
         </p>
         <h1 className="max-w-xl font-hand text-3xl leading-tight text-ink sm:text-4xl">
-          a tiny world made of things that remind me of you ✨
+          I made you a tiny world ✨
         </h1>
         <div className="mt-10 flex items-center gap-3">
           <DoodleStar />
