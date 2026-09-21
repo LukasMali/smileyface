@@ -121,9 +121,6 @@ export function World() {
           </svg>
           finished · replayable
         </Pill>
-        <Pill className="bg-white/70 text-ink-soft">
-          <LockGlyph /> locked · keep exploring
-        </Pill>
         <GameButton size="sm" tone="pink" onClick={() => nav("/room")}>
           back to the room
         </GameButton>

@@ -519,24 +519,3 @@ input[type="range"] {
 .reduce-motion .anim-blink {
   transform: scaleY(0.02);
 }
-
-@media (prefers-reduced-motion: reduce) {
-  .anim-float,
-  .anim-float-slow,
-  .anim-bob,
-  .anim-breathe,
-  .anim-sway,
-  .anim-twinkle,
-  .anim-swim,
-  .anim-blink,
-  .anim-ear,
-  .anim-tail,
-  .anim-wiggle,
-  .anim-drip,
-  .shimmer-line::after {
-    animation: none !important;
-  }
-  .anim-blink {
-    transform: scaleY(0.02);
-  }
-}

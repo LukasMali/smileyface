@@ -311,7 +311,7 @@ export function Room() {
           <Chair night={night} />
         </Hotspot>
 
-        <Hotspot x="69%" b="34%" w="7%" label="warm drink" onClick={() => { play("pop"); notify(sweetNote()) }}>
+        <Hotspot x="69%" b="34%" w="7%" label="hot chocolate" onClick={() => { play("pop"); notify("hot chocolate. the correct drink.") }}>
           <Mug />
         </Hotspot>
 
@@ -554,10 +554,10 @@ function PcTower({ glow, on }: { glow: string; on: boolean }) {
 function HeadphonesArt({ on }: { on: boolean }) {
   return (
     <svg viewBox="0 0 70 62" className="w-full" aria-hidden>
-      <path d="M12 36V30a23 23 0 0 1 46 0v6" fill="none" stroke="#5b4450" strokeWidth="4" strokeLinecap="round" />
-      <rect x="4" y="32" width="16" height="24" rx="8" fill="#ff8fae" stroke="#5b4450" strokeWidth="2" />
-      <rect x="50" y="32" width="16" height="24" rx="8" fill="#ff8fae" stroke="#5b4450" strokeWidth="2" />
-      <path d="M8 38c1 6 1 11 0 14" stroke="#fff" strokeWidth="2" fill="none" opacity="0.7" />
+      <path d="M12 36V30a23 23 0 0 1 46 0v6" fill="none" stroke="#246e59" strokeWidth="4" strokeLinecap="round" />
+      <rect x="4" y="32" width="16" height="24" rx="8" fill="#2e8b71" stroke="#5b4450" strokeWidth="2" />
+      <rect x="50" y="32" width="16" height="24" rx="8" fill="#2e8b71" stroke="#5b4450" strokeWidth="2" />
+      <path d="M8 38c1 6 1 11 0 14" stroke="#fff" strokeWidth="2" fill="none" opacity="0.55" />
       {on && (
         <g className="anim-float">
           <circle cx="35" cy="12" r="4" fill="#ffd45e" stroke="#5b4450" strokeWidth="1.4" />
@@ -622,10 +622,17 @@ function Chair({ night }: { night: boolean }) {
 function Mug() {
   return (
     <svg viewBox="0 0 48 48" className="w-full" aria-hidden>
-      <path d="M8 14h26v20a8 8 0 0 1-8 8h-10a8 8 0 0 1-8-8z" fill="#fff" stroke="#5b4450" strokeWidth="2.2" />
+      <path d="M8 14h26v20a8 8 0 0 1-8 8h-10a8 8 0 0 1-8-8z" fill="#fffaf2" stroke="#5b4450" strokeWidth="2.2" />
       <path d="M34 20h5a5 5 0 0 1 0 10h-5" fill="none" stroke="#5b4450" strokeWidth="2.2" />
-      <ellipse cx="21" cy="15" rx="13" ry="3.4" fill="#c98a5c" />
-      <path d="M16 8c2-3 0-5 0-5M24 8c2-4 0-6 0-6" stroke="#e0cfe0" strokeWidth="2" fill="none" strokeLinecap="round" className="anim-float" />
+      <ellipse cx="21" cy="15" rx="13" ry="3.6" fill="#5a2e18" />
+      <ellipse cx="21" cy="14.2" rx="10" ry="2.2" fill="#7a4324" opacity="0.9" />
+      {/* whipped cream */}
+      <path d="M12 14c1-5 5-8 9-8 5 0 9 3 10 8-3-2-7-2-10-1-3-1-6 0-9 1z" fill="#fffaf2" stroke="#e8d7c4" strokeWidth="1.2" />
+      <ellipse cx="21" cy="10" rx="4.2" ry="2.4" fill="#fff" />
+      {/* marshmallows */}
+      <rect x="16" y="10.5" width="5.2" height="3.6" rx="1.3" fill="#ffe6f0" stroke="#e8b7c8" strokeWidth="0.7" />
+      <rect x="22" y="9.8" width="5" height="3.4" rx="1.3" fill="#fff6e8" stroke="#e8d3b0" strokeWidth="0.7" />
+      <path d="M16 8c2-3 0-5 0-5M25 7c2-4 0-6 0-6" stroke="#e0cfe0" strokeWidth="2" fill="none" strokeLinecap="round" className="anim-float" />
     </svg>
   )
 }

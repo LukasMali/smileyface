@@ -258,9 +258,9 @@ export function Licence({ size = 62, className = "" }: Base) {
 export function Headphones({ size = 56, className = "" }: Base) {
   return (
     <svg width={size} height={size} viewBox="0 0 56 56" className={`sticker ${className}`} aria-hidden>
-      <path d="M10 34V28a18 18 0 0 1 36 0v6" fill="none" stroke={LINE} strokeWidth="3.4" strokeLinecap="round" />
-      <rect x="4" y="30" width="12" height="20" rx="6" fill={PALETTE.rose} stroke={LINE} strokeWidth={STROKE.base} />
-      <rect x="40" y="30" width="12" height="20" rx="6" fill={PALETTE.rose} stroke={LINE} strokeWidth={STROKE.base} />
+      <path d="M10 34V28a18 18 0 0 1 36 0v6" fill="none" stroke="#246e59" strokeWidth="3.4" strokeLinecap="round" />
+      <rect x="4" y="30" width="12" height="20" rx="6" fill="#2e8b71" stroke={LINE} strokeWidth={STROKE.base} />
+      <rect x="40" y="30" width="12" height="20" rx="6" fill="#2e8b71" stroke={LINE} strokeWidth={STROKE.base} />
       <path d="M7 34c1 6 1 10 0 13" stroke="#fff" strokeWidth="2" fill="none" opacity="0.6" />
     </svg>
   )

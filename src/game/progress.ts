@@ -96,6 +96,7 @@ export function applyUnlocks(s: SaveData): SaveData {
     u.add("shelf-revenge")
     u.add("food-shrine")
   }
+  done.forEach((id) => u.add(id))
   if (s.santaUnlocked || s.discoveredSecrets.includes("santa-key")) {
     u.add("santa")
   }
@@ -142,6 +143,7 @@ export function withProgress(s: SaveData): { save: SaveData; unlocked: Achieveme
 }
 
 export function isAreaOpen(s: SaveData, id: AreaId) {
+  if (s.completedLevels.includes(id)) return true
   if (id === "santa") return s.santaUnlocked || s.unlockedAreas.includes("santa")
   return s.unlockedAreas.includes(id)
 }

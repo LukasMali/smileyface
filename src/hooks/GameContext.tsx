@@ -73,10 +73,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
     saveRef.current = save
   }, [save])
 
-  const reducedMotion =
-    save.settings.reducedMotion ||
-    save.settings.animations === false ||
-    (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+  // gameplay motion follows the in-game toggles only. Windows "animation effects"
+  // (prefers-reduced-motion) would otherwise freeze the whole world on desktop
+  // while phones — which don't expose that flag — kept moving.
+  const reducedMotion = save.settings.reducedMotion || save.settings.animations === false
 
   useEffect(() => {
     setSoundEnabled(save.settings.sound)

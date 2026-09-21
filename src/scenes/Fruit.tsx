@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react"
-import { motion } from "framer-motion"
 import { CactusIceCream } from "../art/Props"
 import { FRUIT_KINDS, FruitArt, type FruitKind } from "../art/Fruits"
 import { useGame } from "../hooks/GameContext"
@@ -17,28 +16,43 @@ export function Fruit() {
   const [on, setOn] = useState(true)
   const id = useRef(0)
   const comboRef = useRef(0)
+  const dropsRef = useRef<Drop[]>([])
+  const nodes = useRef(new Map<number, HTMLButtonElement>())
 
   useEffect(() => {
     if (!on) return
     const spawn = window.setInterval(() => {
-      setDrops((d) => [
-        ...d.slice(-16),
-        {
-          id: ++id.current,
-          x: rand(8, 84),
-          y: -10,
-          kind: FRUIT_KINDS[Math.floor(Math.random() * FRUIT_KINDS.length)] as FruitKind,
-          vy: rand(14, 30),
-          spin: rand(-40, 40),
-        },
-      ])
+      const drop: Drop = {
+        id: ++id.current,
+        x: rand(8, 84),
+        y: -10,
+        kind: FRUIT_KINDS[Math.floor(Math.random() * FRUIT_KINDS.length)] as FruitKind,
+        vy: rand(14, 30),
+        spin: rand(-40, 40),
+      }
+      dropsRef.current = [...dropsRef.current.slice(-16), drop]
+      setDrops(dropsRef.current)
     }, 720)
     let raf = 0
     let last = performance.now()
     const tick = (now: number) => {
       const dt = Math.min(0.05, (now - last) / 1000)
       last = now
-      setDrops((d) => d.map((f) => ({ ...f, y: f.y + f.vy * dt })).filter((f) => f.y < 108))
+      let lost = false
+      for (const f of dropsRef.current) {
+        f.y += f.vy * dt
+        f.spin += 50 * dt
+        if (f.y >= 108) lost = true
+        const el = nodes.current.get(f.id)
+        if (!el) continue
+        el.style.left = `${f.x}%`
+        el.style.top = `${f.y}%`
+        el.style.transform = `translateX(-50%) rotate(${f.spin}deg)`
+      }
+      if (lost) {
+        dropsRef.current = dropsRef.current.filter((f) => f.y < 108)
+        setDrops(dropsRef.current)
+      }
       raf = requestAnimationFrame(tick)
     }
     raf = requestAnimationFrame(tick)
@@ -51,7 +65,8 @@ export function Fruit() {
   const catchOne = (f: Drop, e: React.MouseEvent) => {
     play("sparkle")
     poke(e.clientX, e.clientY, "star")
-    setDrops((d) => d.filter((x) => x.id !== f.id))
+    dropsRef.current = dropsRef.current.filter((x) => x.id !== f.id)
+    setDrops(dropsRef.current)
     comboRef.current += 1
     setCombo(comboRef.current)
     const next = score + 1 + Math.floor(comboRef.current / 5)
@@ -129,19 +144,20 @@ export function Fruit() {
         </svg>
 
         {drops.map((f) => (
-          <motion.button
+          <button
             key={f.id}
             type="button"
-            className="hit-area absolute -translate-x-1/2 border-0 bg-transparent p-0"
-            style={{ left: `${f.x}%`, top: `${f.y}%` }}
+            ref={(el) => {
+              if (el) nodes.current.set(f.id, el)
+              else nodes.current.delete(f.id)
+            }}
+            className="hit-area absolute border-0 bg-transparent p-0 active:scale-110"
+            style={{ left: `${f.x}%`, top: `${f.y}%`, transform: "translateX(-50%)", willChange: "top, transform" }}
             aria-label={`catch ${f.kind}`}
-            animate={{ rotate: f.spin }}
-            transition={{ duration: 2, ease: "linear" }}
-            whileTap={{ scale: 1.3 }}
             onClick={(e) => catchOne(f, e)}
           >
             <FruitArt kind={f.kind} size={46} />
-          </motion.button>
+          </button>
         ))}
 
         <button

@@ -1,4 +1,4 @@
-import { AnimatePresence } from "framer-motion"
+import { AnimatePresence, MotionConfig } from "framer-motion"
 import { lazy, Suspense, useEffect, useState, type ReactNode } from "react"
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom"
 import { areaById } from "./game/areas"
@@ -57,6 +57,7 @@ function Shell() {
   }, [poke])
 
   return (
+    <MotionConfig reducedMotion={reducedMotion ? "always" : "never"}>
     <div className={`app-root ${reducedMotion ? "reduce-motion" : ""}`}>
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-[90] focus:rounded-full focus:bg-white focus:px-3 focus:py-2">
         skip to world
@@ -101,6 +102,7 @@ function Shell() {
       <FinaleOverlay />
       <SettingsModal open={settings} onClose={() => setSettings(false)} />
     </div>
+    </MotionConfig>
   )
 }
 
