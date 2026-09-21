@@ -149,7 +149,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
             setJustAchievements(unlocked)
             unlocked.forEach((id) => {
               const def = ACHIEVEMENTS.find((a) => a.id === id)
-              notify(`${def?.icon ?? "✨"} ${def?.title ?? id}`, "achieve")
+              notify(def?.title ?? id, "achieve")
             })
             playSound("achieve")
             window.setTimeout(() => setJustAchievements([]), 4200)

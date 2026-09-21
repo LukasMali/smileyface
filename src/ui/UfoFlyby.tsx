@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { useGame } from "../hooks/GameContext"
-import { MrAlien } from "../components/characters/MrAlien"
+import { MrAlien } from "../art/Alien"
 
 export function UfoFlyby() {
   const { save, play, reducedMotion } = useGame()

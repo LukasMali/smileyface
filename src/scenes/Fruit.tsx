@@ -1,16 +1,16 @@
 import { useEffect, useRef, useState } from "react"
-import { CactusIceCream } from "../components/characters/CactusIceCream"
+import { motion } from "framer-motion"
+import { CactusIceCream } from "../art/Props"
+import { FRUIT_KINDS, FruitArt, type FruitKind } from "../art/Fruits"
 import { useGame } from "../hooks/GameContext"
 import { rand } from "../lib/random"
-import { GameButton, Tag } from "../ui/Button"
+import { GameButton, Panel, Pill, ProgressBar } from "../ui/Button"
 import { PageShell } from "../ui/PageShell"
 
-const KINDS = ["🍓", "🍉", "🍇", "🍑", "🍒", "🫐", "🍊", "🍎", "🥝"] as const
-
-type Drop = { id: number; x: number; y: number; kind: (typeof KINDS)[number]; vy: number }
+type Drop = { id: number; x: number; y: number; kind: FruitKind; vy: number; spin: number }
 
 export function Fruit() {
-  const { notify, play, patch, save, completeLevel, highScore, discoverSecret, addCoins } = useGame()
+  const { notify, play, patch, save, completeLevel, highScore, discoverSecret, addCoins, poke } = useGame()
   const [drops, setDrops] = useState<Drop[]>([])
   const [score, setScore] = useState(0)
   const [combo, setCombo] = useState(0)
@@ -22,13 +22,23 @@ export function Fruit() {
     if (!on) return
     const spawn = window.setInterval(() => {
       setDrops((d) => [
-        ...d.slice(-18),
-        { id: ++id.current, x: rand(8, 86), y: -8, kind: KINDS[Math.floor(Math.random() * KINDS.length)] as (typeof KINDS)[number], vy: rand(0.45, 1.1) },
+        ...d.slice(-16),
+        {
+          id: ++id.current,
+          x: rand(8, 84),
+          y: -10,
+          kind: FRUIT_KINDS[Math.floor(Math.random() * FRUIT_KINDS.length)] as FruitKind,
+          vy: rand(14, 30),
+          spin: rand(-40, 40),
+        },
       ])
-    }, 700)
+    }, 720)
     let raf = 0
-    const tick = () => {
-      setDrops((d) => d.map((f) => ({ ...f, y: f.y + f.vy })).filter((f) => f.y < 110))
+    let last = performance.now()
+    const tick = (now: number) => {
+      const dt = Math.min(0.05, (now - last) / 1000)
+      last = now
+      setDrops((d) => d.map((f) => ({ ...f, y: f.y + f.vy * dt })).filter((f) => f.y < 108))
       raf = requestAnimationFrame(tick)
     }
     raf = requestAnimationFrame(tick)
@@ -38,8 +48,9 @@ export function Fruit() {
     }
   }, [on])
 
-  const catchOne = (f: Drop) => {
+  const catchOne = (f: Drop, e: React.MouseEvent) => {
     play("sparkle")
+    poke(e.clientX, e.clientY, "star")
     setDrops((d) => d.filter((x) => x.id !== f.id))
     comboRef.current += 1
     setCombo(comboRef.current)
@@ -50,7 +61,7 @@ export function Fruit() {
       collectedFruit: s.collectedFruit.includes(f.kind) ? s.collectedFruit : [...s.collectedFruit, f.kind],
       fruitStickers: s.fruitStickers.includes(f.kind) ? s.fruitStickers : [...s.fruitStickers, f.kind],
     }))
-    if (comboRef.current >= 8) notify("FRUIT FRENZY")
+    if (comboRef.current === 8) notify("FRUIT FRENZY")
     if (next >= 20 && !save.completedLevels.includes("fruit")) completeLevel("fruit")
     highScore("fruit", next)
     addCoins(1)
@@ -60,38 +71,110 @@ export function Fruit() {
     }, 1200)
   }
 
+  const stickers = save.fruitStickers.filter((s): s is FruitKind => (FRUIT_KINDS as string[]).includes(s))
+
   return (
-    <PageShell title="Fruit Garden" area="fruit" tint="#ffe8c8">
-      <Tag>tap falling fruit · combos make juice sparkles</Tag>
-      <p className="mb-2 font-hand text-sm">
-        score {score} · combo {combo} {combo >= 8 ? "· FRUIT FRENZY" : ""}
-      </p>
-      <div className="relative mx-auto min-h-[380px] max-w-md overflow-hidden rounded-[1.8rem] bg-linear-to-b from-sky to-[#b7e39a]" data-testid="fruit-garden">
+    <PageShell
+      title="Fruit Garden"
+      area="fruit"
+      subtitle="tap falling fruit · combos make juice sparkles"
+      tint="linear-gradient(180deg,#eaf6ff 0%,#eef8e4 55%,#fff3dd 100%)"
+      aside={<Pill className="bg-butter">best {save.highScores.fruit ?? 0}</Pill>}
+    >
+      <div className="mx-auto mb-2 flex max-w-md flex-wrap items-center justify-between gap-2">
+        <Pill className="bg-white">score {score}</Pill>
+        <Pill className={combo >= 8 ? "bg-blush-deep" : "bg-mint"}>
+          combo x{combo} {combo >= 8 ? "· FRENZY" : ""}
+        </Pill>
+        <GameButton size="sm" onClick={() => setOn((v) => !v)}>
+          {on ? "pause" : "resume"}
+        </GameButton>
+      </div>
+
+      <div
+        className="stage mx-auto min-h-[24rem] max-w-md"
+        data-testid="fruit-garden"
+        style={{ background: "linear-gradient(180deg,#cfeeff 0%,#e2f5e6 55%,#a8dd82 100%)" }}
+      >
+        <svg viewBox="0 0 360 400" className="pointer-events-none absolute inset-0 h-full w-full" aria-hidden>
+          <circle cx="300" cy="50" r="28" fill="#ffe89a" />
+          <g fill="#fff" opacity="0.9" className="anim-float">
+            <ellipse cx="80" cy="48" rx="34" ry="15" />
+            <ellipse cx="106" cy="42" rx="22" ry="12" />
+          </g>
+          {/* trees */}
+          {[
+            [36, 250],
+            [326, 262],
+          ].map(([x, y]) => (
+            <g key={x} transform={`translate(${x} ${y})`}>
+              <rect x="-7" y="0" width="14" height="70" rx="7" fill="#b98b63" />
+              <circle cx="0" cy="-18" r="40" fill="#7dcc93" stroke="#5fb083" strokeWidth="3" />
+              <circle cx="-16" cy="-30" r="20" fill="#9ce2b8" opacity="0.7" />
+              <circle cx="14" cy="-8" r="6" fill="#ef6b92" />
+              <circle cx="-8" cy="-2" r="5" fill="#ef6b92" />
+            </g>
+          ))}
+          {/* fence + grass */}
+          <path d="M0 348h360v52H0z" fill="#8fcf6a" />
+          {Array.from({ length: 9 }).map((_, i) => (
+            <g key={i} transform={`translate(${12 + i * 42} 318)`}>
+              <rect x="0" y="0" width="10" height="34" rx="4" fill="#e8d2b0" stroke="#c9ad8a" strokeWidth="2" />
+            </g>
+          ))}
+          <path d="M0 330h360" stroke="#e8d2b0" strokeWidth="7" />
+          {Array.from({ length: 16 }).map((_, i) => (
+            <path key={`g${i}`} d={`M${8 + i * 23} 372c4-12 8-16 10-20`} stroke="#6fbd53" strokeWidth="3" fill="none" strokeLinecap="round" />
+          ))}
+        </svg>
+
         {drops.map((f) => (
-          <button
+          <motion.button
             key={f.id}
             type="button"
-            className="absolute min-h-11 min-w-11 -translate-x-1/2 border-0 bg-transparent text-2xl"
+            className="hit-area absolute -translate-x-1/2 border-0 bg-transparent p-0"
             style={{ left: `${f.x}%`, top: `${f.y}%` }}
             aria-label={`catch ${f.kind}`}
-            onClick={() => catchOne(f)}
+            animate={{ rotate: f.spin }}
+            transition={{ duration: 2, ease: "linear" }}
+            whileTap={{ scale: 1.3 }}
+            onClick={(e) => catchOne(f, e)}
           >
-            {f.kind}
-          </button>
+            <FruitArt kind={f.kind} size={46} />
+          </motion.button>
         ))}
+
         <button
           type="button"
-          className="absolute bottom-2 right-3 border-0 bg-transparent p-0"
+          className="hit-area absolute right-2 bottom-2 border-0 bg-transparent p-0"
           aria-label="cactus ice cream secret"
           onClick={() => discoverSecret("cactus-pop", "cactus pops · friends 4 ever")}
         >
-          <CactusIceCream body="#ff8fab" spots="#fff" className="scale-75" />
+          <CactusIceCream body="#ff8fae" spots="#fff" size={74} />
         </button>
       </div>
-      <div className="mt-3 flex justify-center gap-2">
-        <GameButton onClick={() => setOn((v) => !v)}>{on ? "pause fruit" : "resume"}</GameButton>
-      </div>
-      <p className="mt-2 text-center font-hand text-xs">stickers: {save.fruitStickers.join(" ") || "none yet"}</p>
+
+      <Panel className="mx-auto mt-3 max-w-md bg-white/88">
+        <div className="mb-2 flex items-center justify-between font-hand text-sm">
+          <span>fruit sticker book</span>
+          <span>
+            {stickers.length}/{FRUIT_KINDS.length}
+          </span>
+        </div>
+        <ProgressBar value={(stickers.length / FRUIT_KINDS.length) * 100} tone="mint" label="fruit collected" className="mb-3" />
+        <div className="flex flex-wrap gap-1.5">
+          {FRUIT_KINDS.map((k) => (
+            <span
+              key={k}
+              className={`inline-flex h-10 w-10 items-center justify-center rounded-2xl border-[1.5px] ${
+                stickers.includes(k) ? "border-ink/12 bg-white" : "border-dashed border-ink/15 bg-white/40 opacity-40 grayscale"
+              }`}
+            >
+              <FruitArt kind={k} size={30} />
+            </span>
+          ))}
+        </div>
+      </Panel>
     </PageShell>
   )
 }

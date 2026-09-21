@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react"
+import { AnimatePresence, motion } from "framer-motion"
 import { ALIEN_LINES } from "../game/messages"
 import { useGame } from "../hooks/GameContext"
 import { chance, pick } from "../lib/random"
-import { MrAlien } from "../components/characters/MrAlien"
+import { MrAlien } from "../art/Alien"
 import { Nikki } from "../art/Nikki"
-import { KawaiiBlob } from "../components/characters/KawaiiBlob"
+import { KawaiiBlob } from "../art/Blob"
+import { Fish } from "../art/Fish"
 
 const EVENTS = [
   "fish-what",
@@ -39,31 +41,43 @@ export function ComedyLayer() {
     return () => window.clearTimeout(hide)
   }, [event, notify, patch, play])
 
-  if (!event) return null
-
   return (
-    <div className="pointer-events-none fixed bottom-24 left-3 z-[70] sm:left-6" aria-hidden>
-      {event === "mystery-fish" && (
-        <svg width="70" height="40" viewBox="0 0 70 40">
-          <ellipse cx="38" cy="20" rx="20" ry="12" fill="#8ecae6" stroke="#4a3f55" strokeWidth="1.4" />
-          <polygon points="16,20 2,10 2,30" fill="#e0d4f7" />
-          <circle cx="48" cy="18" r="3" fill="#2a2430" />
-        </svg>
-      )}
-      {event === "alien-tax" && <MrAlien size={70} />}
-      {event === "nini-blanket" && (
-        <div className="relative">
-          <Nikki pose="walk" size={90} />
-          <span className="absolute -top-2 right-0 text-2xl">🛏️</span>
-        </div>
-      )}
-      {event === "fish-what" && <KawaiiBlob mood="confused" size={58} />}
-      {event === "pony-backwards" && (
-        <p className="rounded-full bg-white px-3 py-1 font-hand text-sm shadow">a pony walked backwards somewhere</p>
-      )}
-      {save.happiness > 40 && event === "burger-fall" && (
-        <p className="rounded-full bg-white px-3 py-1 font-hand text-sm shadow">a burger fell over dramatically</p>
-      )}
+    <div className="pointer-events-none fixed bottom-[5.6rem] left-3 z-[70] sm:left-6" aria-hidden>
+      <AnimatePresence>
+        {event && (
+          <motion.div
+            key={event}
+            initial={{ opacity: 0, y: 24, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 16, scale: 0.94 }}
+            transition={{ type: "spring", stiffness: 340, damping: 24 }}
+          >
+            {event === "mystery-fish" && <Fish size={82} extra="confused" color="#9fd4ea" />}
+            {event === "alien-tax" && <MrAlien size={78} mode="banker" />}
+            {event === "nini-blanket" && (
+              <div className="relative">
+                <Nikki pose="walk" size={96} />
+                <svg viewBox="0 0 60 40" className="absolute -top-3 right-0 w-14" aria-hidden>
+                  <path d="M6 24c8-12 40-14 50-4-4 10-40 16-50 4z" fill="#ffd3e0" stroke="#5b4450" strokeWidth="1.8" />
+                  <path d="M14 20c8 4 22 6 34 4" stroke="#f0a8bf" strokeWidth="1.6" fill="none" />
+                </svg>
+              </div>
+            )}
+            {event === "fish-what" && <KawaiiBlob mood="confused" size={62} />}
+            {event === "pony-backwards" && <Quip>a pony walked backwards somewhere</Quip>}
+            {event === "fruit-escape" && <Quip>one strawberry escaped. we let it go.</Quip>}
+            {event === "burger-fall" && save.happiness > 40 && <Quip>a burger fell over dramatically</Quip>}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
+  )
+}
+
+function Quip({ children }: { children: string }) {
+  return (
+    <p className="max-w-[70vw] rounded-full border-[1.5px] border-ink/10 bg-white/96 px-3.5 py-1.5 font-hand text-sm shadow-[0_12px_22px_-16px_rgba(91,68,80,0.9)]">
+      {children}
+    </p>
   )
 }

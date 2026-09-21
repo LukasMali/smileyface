@@ -1,9 +1,10 @@
 import { useState } from "react"
 import { SantaArt, RobuxInfinity } from "../art/Santa"
-import { MrAlien } from "../components/characters/MrAlien"
-import { KawaiiBlob } from "../components/characters/KawaiiBlob"
+import { Coin, MrAlien } from "../art/Alien"
+import { KawaiiBlob } from "../art/Blob"
+import { GiftBox } from "../art/Props"
 import { useGame } from "../hooks/GameContext"
-import { GameButton, Tag } from "../ui/Button"
+import { GameButton, Panel, Tag } from "../ui/Button"
 import { PageShell } from "../ui/PageShell"
 
 export function Santa() {
@@ -12,29 +13,49 @@ export function Santa() {
 
   if (!save.santaUnlocked && !save.discoveredSecrets.includes("santa-key")) {
     return (
-      <PageShell title="Santa's Secret Room" area="santa" tint="#1c1a33" night>
-        <p className="font-hand text-lg">the door is humming Christmas in July energy.</p>
-        <p className="mt-2 font-hand text-sm text-lilac">find the tiny hidden gift in Dreamland, the meadow, or a UFO grant.</p>
-        <GameButton
-          className="mt-4"
-          onClick={() => {
-            discoverSecret("santa-key", "the gift was in your pocket the whole time. classic.")
-            play("chime")
-          }}
-        >
-          knock in a silly way
-        </GameButton>
+      <PageShell
+        title="Santa's Secret Room"
+        area="santa"
+        night
+        subtitle="the door is humming christmas-in-july energy"
+        tint="linear-gradient(180deg,#2a2450 0%,#1e1a3c 100%)"
+      >
+        <Panel className="mx-auto max-w-md bg-white/10 text-center">
+          <div className="mx-auto mb-2 w-fit anim-bob">
+            <GiftBox size={72} />
+          </div>
+          <p className="font-hand text-lg text-cream">this door only opens for people who found the tiny gift.</p>
+          <p className="mt-2 font-hand text-sm text-lilac">
+            it is hiding in Dreamland, in the meadow, or inside a suspicious UFO grant.
+          </p>
+          <GameButton
+            className="mt-4"
+            tone="pink"
+            onClick={() => {
+              discoverSecret("santa-key", "the gift was in your pocket the whole time. classic.")
+              play("chime")
+            }}
+          >
+            knock in a silly way
+          </GameButton>
+        </Panel>
       </PageShell>
     )
   }
 
   return (
-    <PageShell title="Santa's Secret Room" area="santa" tint="#3d1f24">
-      <Tag className="bg-white">HO HO HO</Tag>
+    <PageShell
+      title="Santa's Secret Room"
+      area="santa"
+      night
+      subtitle="it is not december. he does not care."
+      tint="linear-gradient(180deg,#4a2129 0%,#2a1a2c 100%)"
+      aside={<Tag className="bg-white">HO HO HO</Tag>}
+    >
       {step === 0 && (
         <div className="text-center">
           <SantaArt size={180} className="mx-auto anim-bob" />
-          <p className="mt-3 font-hand text-3xl text-cream">🎅 HO HO HO</p>
+          <p className="mt-3 font-hand text-3xl text-cream">HO HO HO</p>
           <GameButton className="mt-4" tone="pink" onClick={() => { setStep(1); play("achieve") }}>
             continue
           </GameButton>
@@ -51,14 +72,14 @@ export function Santa() {
           {Array.from({ length: 16 }).map((_, i) => (
             <span
               key={i}
-              className="absolute text-lg"
+              className="absolute"
               style={{
                 left: `${(i * 6 + 4) % 92}%`,
                 animation: `rain-coin ${2.4 + (i % 4) * 0.2}s linear infinite`,
                 animationDelay: `${i * 0.08}s`,
               }}
             >
-              {i % 3 === 0 ? "🎁" : "✨"}
+              {i % 3 === 0 ? <GiftBox size={26} /> : <Coin size={20} />}
             </span>
           ))}
           <RobuxInfinity className="relative mx-auto w-64" />
