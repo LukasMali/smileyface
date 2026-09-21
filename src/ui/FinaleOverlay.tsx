@@ -41,7 +41,7 @@ export function FinaleOverlay() {
       animate={{ opacity: show ? 1 : 0 }}
       transition={{ duration: reducedMotion ? 0.2 : 0.48, ease: EASE }}
       style={{ pointerEvents: show ? "auto" : "none" }}
-      {...{ inert: show ? undefined : "" }}
+      inert={!show}
     >
       {show &&
         !reducedMotion &&
