@@ -102,10 +102,11 @@ export function Ponies() {
           ))}
         </svg>
 
-        <div className="relative z-10 grid grid-cols-2 items-end justify-items-center gap-x-1 gap-y-0 px-2 pt-3 pb-4 sm:grid-cols-4">
+        <div className="pointer-events-none relative z-10 grid grid-cols-2 items-end justify-items-center gap-x-1 gap-y-0 px-2 pt-3 pb-4 sm:grid-cols-4">
           {ponies.map((p, i) => (
             <motion.div
               key={p.id}
+              className="pointer-events-auto"
               animate={{ scale: active === i ? 1 : 0.9, y: active === i ? -4 : 0 }}
               transition={{ type: "spring", stiffness: 320, damping: 24 }}
             >
@@ -125,16 +126,21 @@ export function Ponies() {
           ))}
         </div>
 
+        {/* peeking from the left grass — above the ponies so he is actually tappable */}
         <button
           type="button"
-          className="absolute bottom-2 left-3 border-0 bg-transparent p-0 opacity-60 transition-opacity hover:opacity-100"
+          data-testid="pony-alien"
+          className="hit-area absolute bottom-[18%] left-1 z-30 flex h-[4.4rem] w-[4.4rem] items-end justify-center overflow-hidden border-0 bg-transparent p-0"
           aria-label="hidden Mr Alien"
           onClick={(e) => {
+            e.stopPropagation()
             poke(e.clientX, e.clientY, "coin")
             discoverSecret("pony-alien", "Mr Alien was tax-evading in the meadow")
           }}
         >
-          <MrAlien size={54} mode="peek" />
+          <span className="translate-y-4 opacity-90 transition-transform hover:translate-y-1">
+            <MrAlien size={62} mode="peek" />
+          </span>
         </button>
       </div>
 

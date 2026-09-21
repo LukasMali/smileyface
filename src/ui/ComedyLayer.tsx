@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { ALIEN_LINES } from "../game/messages"
 import { useGame } from "../hooks/GameContext"
@@ -18,38 +18,67 @@ const EVENTS = [
   "mystery-fish",
 ] as const
 
+type Kind = (typeof EVENTS)[number]
+type Tick = { id: number; kind: Kind }
+
+const LINES: Record<Kind, string> = {
+  "fish-what": "a fish somewhere just said: what",
+  "pony-backwards": "a pony walked backwards somewhere",
+  "alien-tax": "",
+  "nini-blanket": "Nini has stolen a blanket. again.",
+  "fruit-escape": "one strawberry escaped. we let it go.",
+  "burger-fall": "a burger fell over dramatically",
+  "mystery-fish": "a mystery fish is judging you. silently.",
+}
+
 export function ComedyLayer() {
   const { patch, notify, play, reducedMotion, save } = useGame()
-  const [event, setEvent] = useState<string | null>(null)
+  const [tick, setTick] = useState<Tick | null>(null)
+  const counted = useRef(new Set<number>())
+  const comedyRef = useRef(save.comedyCount)
+  const seq = useRef(0)
 
   useEffect(() => {
-    if (reducedMotion) return
+    comedyRef.current = save.comedyCount
+  }, [save.comedyCount])
+
+  // comedy is a game system, not decoration — it must still fire even if
+  // Windows / the browser has prefers-reduced-motion turned on
+  useEffect(() => {
+    const spawn = () => setTick({ id: ++seq.current, kind: pick(EVENTS) })
+    const first = window.setTimeout(spawn, 5000)
     const t = window.setInterval(() => {
-      if (chance(0.28)) setEvent(pick(EVENTS))
-    }, 24000)
-    return () => window.clearInterval(t)
-  }, [reducedMotion])
+      if (comedyRef.current < 6 || chance(0.55)) spawn()
+    }, 12000)
+    return () => {
+      window.clearTimeout(first)
+      window.clearInterval(t)
+    }
+  }, [])
 
   useEffect(() => {
-    if (!event) return
+    if (!tick) return
+    if (counted.current.has(tick.id)) return
+    counted.current.add(tick.id)
     patch((s) => ({ ...s, comedyCount: s.comedyCount + 1 }))
     play("pop")
-    if (event === "alien-tax") notify(pick(ALIEN_LINES))
-    if (event === "fish-what") notify("a fish somewhere just said: what")
-    if (event === "nini-blanket") notify("Nini has stolen a blanket. again.")
-    const hide = window.setTimeout(() => setEvent(null), 4200)
+    const line = tick.kind === "alien-tax" ? pick(ALIEN_LINES) : LINES[tick.kind]
+    if (line) notify(line)
+    const hide = window.setTimeout(() => setTick(null), 4800)
     return () => window.clearTimeout(hide)
-  }, [event, notify, patch, play])
+  }, [tick, notify, patch, play])
+
+  const event = tick?.kind
 
   return (
-    <div className="pointer-events-none fixed bottom-[5.6rem] left-3 z-[70] sm:left-6" aria-hidden>
+    <div className="pointer-events-none fixed bottom-[6.2rem] left-3 z-[70] sm:left-6" aria-live="polite">
       <AnimatePresence>
         {event && (
           <motion.div
-            key={event}
-            initial={{ opacity: 0, y: 24, scale: 0.9 }}
+            key={tick?.id}
+            initial={reducedMotion ? { opacity: 1 } : { opacity: 0, y: 24, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 16, scale: 0.94 }}
+            exit={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 16, scale: 0.94 }}
             transition={{ type: "spring", stiffness: 340, damping: 24 }}
           >
             {event === "mystery-fish" && <Fish size={82} extra="confused" color="#9fd4ea" />}
@@ -66,7 +95,7 @@ export function ComedyLayer() {
             {event === "fish-what" && <KawaiiBlob mood="confused" size={62} />}
             {event === "pony-backwards" && <Quip>a pony walked backwards somewhere</Quip>}
             {event === "fruit-escape" && <Quip>one strawberry escaped. we let it go.</Quip>}
-            {event === "burger-fall" && save.happiness > 40 && <Quip>a burger fell over dramatically</Quip>}
+            {event === "burger-fall" && <Quip>a burger fell over dramatically</Quip>}
           </motion.div>
         )}
       </AnimatePresence>
