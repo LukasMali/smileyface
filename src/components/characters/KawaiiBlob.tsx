@@ -7,6 +7,9 @@ export type BlobMood =
   | "confused"
   | "thumb"
   | "scream"
+  | "sleepy"
+  | "panic"
+  | "victory"
 
 export function KawaiiBlob({
   mood,
@@ -95,6 +98,30 @@ export function KawaiiBlob({
           <ellipse cx="50" cy="42" rx="5" ry="7" fill="#2a2430" />
           <ellipse cx="40" cy="58" rx="8" ry="10" fill="#2a2430" />
           <circle cx="38" cy="56" r="2" fill="#fff" />
+        </>
+      )}
+      {mood === "sleepy" && (
+        <>
+          <path d="M26 46 Q32 42 36 46" stroke="#4a3f55" strokeWidth="2" fill="none" />
+          <path d="M44 46 Q50 42 54 46" stroke="#4a3f55" strokeWidth="2" fill="none" />
+          <path d="M34 56 Q40 60 46 56" stroke="#4a3f55" strokeWidth="1.5" fill="none" />
+          <text x="56" y="24" fontSize="10" fill="#6b5d78">z</text>
+        </>
+      )}
+      {mood === "panic" && (
+        <>
+          <ellipse cx="30" cy="44" rx="6" ry="8" fill="#2a2430" />
+          <ellipse cx="50" cy="44" rx="6" ry="8" fill="#2a2430" />
+          <ellipse cx="40" cy="58" rx="7" ry="6" fill="#2a2430" />
+          <path d="M18 28 l-8 -8 M62 28 l8 -8" stroke="#ff8fab" strokeWidth="2" />
+        </>
+      )}
+      {mood === "victory" && (
+        <>
+          <path d="M26 46 Q32 38 36 46" stroke="#4a3f55" strokeWidth="2" fill="none" />
+          <path d="M44 46 Q50 38 54 46" stroke="#4a3f55" strokeWidth="2" fill="none" />
+          <path d="M32 54 Q40 66 48 54" fill="#ffd6e0" stroke="#4a3f55" strokeWidth="1.3" />
+          <path d="M18 34 h-8 v-10 h6 v6 h8 z" fill="#fffdf8" stroke="#4a3f55" />
         </>
       )}
     </svg>

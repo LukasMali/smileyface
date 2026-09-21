@@ -314,6 +314,92 @@ body {
   min-height: 44px;
 }
 
+.app-root {
+  min-height: 100svh;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: calc(5.2rem + env(safe-area-inset-bottom));
+}
+
+.hud-bar {
+  position: sticky;
+  top: env(safe-area-inset-top);
+  z-index: 84;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.4rem;
+  padding: 0.45rem 0.65rem;
+  background: color-mix(in srgb, var(--color-cream) 82%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+.bottom-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 84;
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.6rem calc(0.45rem + env(safe-area-inset-bottom));
+  background: color-mix(in srgb, var(--color-cream) 90%, transparent);
+  backdrop-filter: blur(10px);
+}
+
+.scene-page {
+  min-height: calc(100svh - 6.5rem);
+  padding: 0.5rem 0.9rem 2.4rem;
+}
+
+.scene-inner {
+  margin: 0 auto;
+  max-width: 56rem;
+}
+
+.room-stage {
+  position: relative;
+  width: 100%;
+  min-height: 360px;
+  height: min(62svh, 520px);
+  overflow: hidden;
+  border-radius: 1.6rem;
+  border: 2px solid rgba(74, 63, 85, 0.1);
+  background:
+    linear-gradient(180deg, var(--wall, #f3e6d4) 0 58%, var(--desk, #efe4d2) 58% 100%);
+  box-shadow: 8px 12px 0 rgba(74, 63, 85, 0.08);
+}
+
+.room-night {
+  --wall: #3a3660;
+  --desk: #2a2648;
+}
+
+.nini-hot {
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.nini-tail {
+  transform-origin: 40px 80px;
+  animation: tail-wag 0.7s ease-in-out infinite;
+}
+
+.nini-walk {
+  animation: bob 0.45s ease-in-out infinite;
+}
+
+.map-cloud {
+  animation: floaty 8s ease-in-out infinite;
+}
+
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -329,6 +415,9 @@ body {
   .anim-ear,
   .anim-tail,
   .anim-wiggle,
+  .nini-tail,
+  .nini-walk,
+  .map-cloud,
   .coin-fall,
   .bubble {
     animation: none !important;
