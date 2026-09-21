@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from "react"
 import { FISH_LINES } from "../game/messages"
 import { useGame } from "../hooks/GameContext"
-import { pick, rand } from "../lib/random"
+import { clamp, pick, rand } from "../lib/random"
 import { PageShell } from "../ui/PageShell"
 import { Panel, Pill } from "../ui/Button"
 import { Fish, type FishExtra } from "../art/Fish"
@@ -15,13 +15,43 @@ type FishDef = {
   size: number
   x: number
   y: number
-  vx: number
-  vy: number
   z: number
   hidden?: boolean
+  heading: number
+  target: number
+  speed: number
+  cruise: number
+  turn: number
+  wander: number
+  vertical: number
+  nextSteer: number
+  facing: 1 | -1
+  phase: number
 }
 
-const START: Omit<FishDef, "x" | "y" | "vx" | "vy">[] = [
+const HABITS: Record<string, { cruise: number; turn: number; wander: number; vertical: number }> = {
+  nurse: { cruise: 11, turn: 1.15, wander: 2.8, vertical: 0.42 },
+  drive: { cruise: 17, turn: 0.95, wander: 3.4, vertical: 0.26 },
+  money: { cruise: 13, turn: 1.2, wander: 2.5, vertical: 0.38 },
+  burger: { cruise: 8.5, turn: 0.8, wander: 3.1, vertical: 0.48 },
+  sleep: { cruise: 5.2, turn: 0.5, wander: 4.6, vertical: 0.32 },
+  artist: { cruise: 12, turn: 1.05, wander: 2.7, vertical: 0.4 },
+  confused: { cruise: 9.5, turn: 2.2, wander: 1.15, vertical: 0.68 },
+  secret: { cruise: 7.8, turn: 1.35, wander: 2.1, vertical: 0.52 },
+}
+
+function wrapPi(a: number) {
+  const t = Math.PI * 2
+  return ((((a + Math.PI) % t) + t) % t) - Math.PI
+}
+
+function lerpAngle(from: number, to: number, t: number) {
+  return from + wrapPi(to - from) * t
+}
+
+type FishSeed = Pick<FishDef, "id" | "name" | "color" | "fin" | "extra" | "size" | "z"> & { hidden?: boolean }
+
+const START: FishSeed[] = [
   { id: "nurse", name: "Nurse Fish", color: "#ff8fae", fin: "#ffffff", extra: "nurse", size: 96, z: 1 },
   { id: "drive", name: "Driving Fish", color: "#ffd45e", fin: "#ffdbe6", extra: "car", size: 92, z: 2 },
   { id: "money", name: "Money Fish", color: "#8fcbec", fin: "#bfa9f0", extra: "coin", size: 100, z: 1 },
@@ -36,16 +66,26 @@ export function Aquarium() {
   const { notify, play, patch, save, completeLevel, discoverSecret, poke, reducedMotion } = useGame()
   const fish = useMemo<FishDef[]>(
     () =>
-      START.map((f, i) => ({
-        ...f,
-        x: 8 + i * 10,
-        y: 18 + (i % 4) * 15,
-        vx: rand(-4, 4),
-        vy: rand(-2, 2),
-      })),
+      START.map((f, i) => {
+        const habit = HABITS[f.id] ?? { cruise: 12, turn: 1, wander: 2.8, vertical: 0.4 }
+        const heading = Math.random() < 0.5 ? rand(-0.28, 0.28) : Math.PI + rand(-0.28, 0.28)
+        return {
+          ...f,
+          ...habit,
+          x: 10 + (i % 4) * 20 + rand(-3, 3),
+          y: 16 + Math.floor(i / 4) * 22 + rand(-4, 4),
+          heading,
+          target: heading,
+          speed: habit.cruise,
+          nextSteer: rand(0.6, 2.2),
+          facing: Math.cos(heading) >= 0 ? 1 : -1,
+          phase: rand(0, Math.PI * 2),
+        }
+      }),
     [],
   )
   const nodes = useRef(new Map<string, HTMLButtonElement>())
+  const tankRef = useRef<HTMLDivElement>(null)
   const seen = useRef(new Set(save.collectedFish))
 
   // swim loop writes transforms straight to the DOM, so React never re-renders per frame
@@ -54,22 +94,43 @@ export function Aquarium() {
     let raf = 0
     let last = performance.now()
     const tick = (now: number) => {
-      const dt = Math.min(0.05, (now - last) / 1000)
+      const dt = Math.min(0.033, (now - last) / 1000)
       last = now
+      const tank = tankRef.current
+      const tw = tank?.clientWidth ?? 0
+      const th = tank?.clientHeight ?? 0
       for (const f of fish) {
-        f.vx = Math.max(-9, Math.min(9, f.vx + rand(-1.4, 1.4)))
-        f.vy = Math.max(-4.5, Math.min(4.5, f.vy + rand(-0.9, 0.9)))
-        f.x += f.vx * dt
-        f.y += f.vy * dt
-        if (f.x < 2 || f.x > 84) f.vx *= -1
-        if (f.y < 6 || f.y > 74) f.vy *= -1
-        f.x = Math.max(2, Math.min(84, f.x))
-        f.y = Math.max(6, Math.min(74, f.y))
+        f.nextSteer -= dt
+        if (f.nextSteer <= 0) {
+          f.target = wrapPi(f.heading + rand(-0.9, 0.9) * (0.45 + f.wander * 0.2))
+          f.nextSteer = rand(f.wander * 0.7, f.wander * 1.5)
+          f.speed = f.cruise * rand(0.82, 1.14)
+        }
+
+        // glide away from the glass instead of bouncing, which used to flip them every frame
+        if (f.x < 12) f.target = lerpAngle(f.target, rand(-0.35, 0.35), 0.55)
+        else if (f.x > 78) f.target = lerpAngle(f.target, Math.PI + rand(-0.35, 0.35), 0.55)
+        if (f.y < 10) f.target = lerpAngle(f.target, rand(0.35, Math.PI - 0.35), 0.45)
+        else if (f.y > 68) f.target = lerpAngle(f.target, rand(-Math.PI + 0.35, -0.35), 0.45)
+
+        const nearGlass = f.x < 11 || f.x > 79 || f.y < 9 || f.y > 69
+        f.heading = lerpAngle(f.heading, f.target, 1 - Math.exp(-f.turn * (nearGlass ? 2.6 : 1) * dt))
+        const vx = Math.cos(f.heading) * f.speed
+        const vy = Math.sin(f.heading) * f.speed * f.vertical
+        f.x = clamp(f.x + vx * dt, 3, 86)
+        f.y = clamp(f.y + vy * dt + Math.sin(now / 900 + f.phase) * 0.35 * dt, 6, 72)
+
+        const dir = Math.cos(f.heading)
+        if (dir > 0.32) f.facing = 1
+        else if (dir < -0.32) f.facing = -1
+
         const el = nodes.current.get(f.id)
-        if (!el) continue
-        el.style.left = `${f.x}%`
-        el.style.top = `${f.y}%`
-        el.style.transform = `scale(${(1.05 - f.z * 0.07) * (f.vx < 0 ? -1 : 1)}, ${1.05 - f.z * 0.07})`
+        if (!el || !tw) continue
+        const s = 1.05 - f.z * 0.07
+        const tilt = clamp((vy / Math.max(4, f.speed)) * 14, -9, 9) * f.facing
+        el.style.left = "0px"
+        el.style.top = "0px"
+        el.style.transform = `translate3d(${(f.x / 100) * tw}px, ${(f.y / 100) * th}px, 0) scale(${s * f.facing}, ${s}) rotate(${tilt}deg)`
       }
       raf = requestAnimationFrame(tick)
     }
@@ -98,6 +159,7 @@ export function Aquarium() {
       aside={<Pill className="bg-sky">{save.collectedFish.length}/8 inspected</Pill>}
     >
       <div
+        ref={tankRef}
         className="stage mx-auto min-h-[24rem] max-w-3xl"
         data-testid="aquarium"
         style={{ background: "linear-gradient(180deg,#5fc0e0 0%,#2f8fb8 55%,#1b6382 100%)" }}
@@ -169,7 +231,8 @@ export function Aquarium() {
               transform: `scale(${1.05 - f.z * 0.07})`,
               opacity: f.hidden ? 0.4 : 1,
               zIndex: 10 - f.z,
-              willChange: "left, top, transform",
+              transformOrigin: "center center",
+              willChange: "transform",
             }}
             onClick={(e) => tap(f, e)}
           >
