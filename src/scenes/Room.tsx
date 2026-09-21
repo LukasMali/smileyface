@@ -172,11 +172,13 @@ export function Room() {
           <svg viewBox="0 0 80 110" className="w-full drop-shadow-md">
             <rect x="2" y="2" width="76" height="106" rx="7" fill={night ? "#4b4479" : "#ffdbe6"} stroke="#5b4450" strokeWidth="2.4" />
             <circle cx="40" cy="44" r="20" fill="#fffaf2" stroke="#5b4450" strokeWidth="1.6" />
-            <circle cx="33" cy="41" r="2.8" fill="#3c3038" />
-            <circle cx="47" cy="41" r="2.8" fill="#3c3038" />
-            <path d="M33 52c4 4 10 4 14 0" stroke="#5b4450" strokeWidth="2" fill="none" strokeLinecap="round" />
-            <circle cx="28" cy="48" r="4" fill="#ff8fae" opacity="0.4" />
-            <circle cx="52" cy="48" r="4" fill="#ff8fae" opacity="0.4" />
+            <circle cx="33" cy="40" r="2.8" fill="#3c3038" />
+            <circle cx="47" cy="40" r="2.8" fill="#3c3038" />
+            <circle cx="33.8" cy="39.2" r="0.9" fill="#fff" />
+            <circle cx="47.8" cy="39.2" r="0.9" fill="#fff" />
+            <path d="M31 49c4 7 14 7 18 0" stroke="#5b4450" strokeWidth="2.2" fill="none" strokeLinecap="round" />
+            <circle cx="28" cy="48" r="4" fill="#ff8fae" opacity="0.45" />
+            <circle cx="52" cy="48" r="4" fill="#ff8fae" opacity="0.45" />
             <text x="40" y="90" textAnchor="middle" fontSize="10" fontWeight="700" fill={night ? "#ffe6f1" : "#5b4450"} fontFamily="Baloo 2, sans-serif">
               tiny world
             </text>
@@ -487,17 +489,25 @@ function Monitor({
         ) : kind === "art" ? (
           <>
             <rect x="14" y="12" width="142" height="80" fill={night ? "#3b3268" : "#fff3f8"} />
-            <circle cx="52" cy="46" r="15" fill="#ffdbe6" />
-            <circle cx="92" cy="54" r="12" fill="#d3ecfb" />
-            <path d="M28 78c20-14 50-16 76-4" stroke="#ff8fae" strokeWidth="4" fill="none" strokeLinecap="round" />
+            <circle cx="85" cy="48" r="26" fill="#ffe6ef" stroke="#ff8fae" strokeWidth="2.4" />
+            <circle cx="76" cy="44" r="3.4" fill="#5b4450" />
+            <circle cx="94" cy="44" r="3.4" fill="#5b4450" />
+            <circle cx="77.2" cy="42.8" r="1.1" fill="#fff" />
+            <circle cx="95.2" cy="42.8" r="1.1" fill="#fff" />
+            <path d="M74 54c4 7 18 7 22 0" stroke="#5b4450" strokeWidth="2.6" fill="none" strokeLinecap="round" />
+            <circle cx="68" cy="52" r="5" fill="#ff8fae" opacity="0.45" />
+            <circle cx="102" cy="52" r="5" fill="#ff8fae" opacity="0.45" />
           </>
         ) : (
           <>
             <rect x="14" y="12" width="142" height="80" fill={night ? "#27305c" : "#dff1ff"} />
-            <ellipse cx="86" cy="70" rx="64" ry="22" fill="#a9e4c0" />
-            <circle cx="126" cy="30" r="10" fill="#ffe89a" />
+            <ellipse cx="86" cy="72" rx="64" ry="20" fill="#a9e4c0" />
+            <circle cx="128" cy="30" r="12" fill="#ffe89a" />
+            <circle cx="124" cy="27" r="1.5" fill="#c9a227" />
+            <circle cx="132" cy="27" r="1.5" fill="#c9a227" />
+            <path d="M123 33c2.4 3.2 7.6 3.2 10 0" stroke="#c9a227" strokeWidth="1.6" fill="none" strokeLinecap="round" />
             <ellipse cx="46" cy="34" rx="18" ry="7" fill="#fff" opacity="0.9" />
-            <path d="M28 66c26-10 66-12 100 2" stroke="#fff3df" strokeWidth="5" fill="none" strokeLinecap="round" />
+            <path d="M36 70c22 8 48 10 78 2" stroke="#fff3df" strokeWidth="5" fill="none" strokeLinecap="round" />
           </>
         )}
         <rect x="14" y="12" width="142" height="80" fill="url(#screen-shine)" opacity="0.18" />

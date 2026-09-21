@@ -1,6 +1,13 @@
-import { ACHIEVEMENTS, START_AREAS } from "./areas"
+import { ACHIEVEMENTS, AREAS, START_AREAS } from "./areas"
+import { NIKKI_LINES } from "./messages"
+import { FRUIT_KINDS } from "../art/Fruits"
 import type { AchievementId, AreaId, SaveData } from "./types"
 import { SAVE_VERSION } from "./types"
+
+/** unique secret ids the game can actually award */
+const SECRET_COUNT = 8
+/** hidden + job fish in the aquarium */
+const FISH_COUNT = 8
 
 export function defaultSave(): SaveData {
   return {
@@ -52,18 +59,21 @@ export function defaultSave(): SaveData {
 }
 
 export function computeHappiness(s: SaveData): number {
-  const levelPart = (s.completedLevels.length / 15) * 56
+  // finishing every place is the finale — don't strand people at 99%
+  if (s.completedLevels.length >= AREAS.length) return 100
+
+  const levelPart = (s.completedLevels.length / AREAS.length) * 56
   const achPart = (s.achievements.length / Math.max(1, ACHIEVEMENTS.length)) * 22
-  const secretPart = Math.min(10, s.discoveredSecrets.length * 0.7)
+  const secretPart = Math.min(10, (s.discoveredSecrets.length / SECRET_COUNT) * 10)
   const extra =
     (s.nailDesign ? 1.4 : 0) +
     (s.licenceAcquired ? 1.6 : 0) +
     (s.niniComfy ? 1.2 : 0) +
-    Math.min(3, s.collectedFruit.length * 0.25) +
-    Math.min(3, s.collectedFish.length * 0.25) +
+    Math.min(3, (s.collectedFruit.length / FRUIT_KINDS.length) * 3) +
+    Math.min(3, (s.collectedFish.length / FISH_COUNT) * 3) +
     (s.artDrawn ? 1.2 : 0) +
     (s.santaUnlocked ? 2 : 0) +
-    Math.min(2, s.nikkiDiscovered.length * 0.2) +
+    Math.min(2, (s.nikkiDiscovered.length / NIKKI_LINES.length) * 2) +
     (s.pcStarted ? 0.6 : 0)
   return Math.min(100, Math.round(levelPart + achPart + secretPart + extra + 4))
 }

@@ -77,11 +77,13 @@ export function Loader() {
       <div className="anim-bob">
         <svg width="72" height="72" viewBox="0 0 72 72" aria-hidden>
           <circle cx="36" cy="36" r="26" fill="#fff" stroke="#5b4450" strokeWidth="2" opacity="0.9" />
-          <circle cx="28" cy="32" r="3.4" fill="#5b4450" />
-          <circle cx="44" cy="32" r="3.4" fill="#5b4450" />
-          <path d="M28 44c4 4 12 4 16 0" stroke="#5b4450" strokeWidth="2.4" fill="none" strokeLinecap="round" />
-          <circle cx="22" cy="40" r="4.4" fill="#ff8fae" opacity="0.35" />
-          <circle cx="50" cy="40" r="4.4" fill="#ff8fae" opacity="0.35" />
+          <circle cx="28" cy="31" r="3.4" fill="#5b4450" />
+          <circle cx="44" cy="31" r="3.4" fill="#5b4450" />
+          <circle cx="29" cy="30" r="1.1" fill="#fff" />
+          <circle cx="45" cy="30" r="1.1" fill="#fff" />
+          <path d="M26 43c5 8 15 8 20 0" stroke="#5b4450" strokeWidth="2.6" fill="none" strokeLinecap="round" />
+          <circle cx="22" cy="40" r="4.4" fill="#ff8fae" opacity="0.4" />
+          <circle cx="50" cy="40" r="4.4" fill="#ff8fae" opacity="0.4" />
         </svg>
       </div>
       <p className="font-hand text-lg">{pick(LOADING_LINES)}</p>
