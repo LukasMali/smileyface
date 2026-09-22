@@ -3,15 +3,16 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-    "scripts": {
-      "dev": "vite",
-      "build": "tsc -b && vite build",
-      "lint": "eslint src",
-      "preview": "vite preview --host --port 4173",
-      "test": "playwright test",
-      "test:e2e": "playwright test"
-    },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint src",
+    "preview": "vite preview --host --port 4173",
+    "test": "playwright test",
+    "test:e2e": "playwright test"
+  },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "framer-motion": "^13.4.0",
     "lucide-react": "^1.47.0",
     "react": "^19.2.8",

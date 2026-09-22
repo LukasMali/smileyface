@@ -1,6 +1,7 @@
 import { AnimatePresence, MotionConfig } from "framer-motion"
 import { lazy, Suspense, useEffect, useState, type ReactNode } from "react"
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom"
+import { Analytics } from "@vercel/analytics/react"
 import { areaById } from "./game/areas"
 import { isAreaOpen } from "./game/progress"
 import type { AreaId } from "./game/types"
@@ -101,6 +102,7 @@ function Shell() {
       <UfoFlyby />
       <FinaleOverlay />
       <SettingsModal open={settings} onClose={() => setSettings(false)} />
+      <Analytics />
     </div>
     </MotionConfig>
   )
