@@ -33,11 +33,11 @@ type Finger = {
 
 /** flesh-only length to the fingertip; nails sit on top and stick out past it */
 const FINGERS: Finger[] = [
-  { i: 0, x: 140, y: 248, len: 74, w0: 30, w1: 22, rot: -36, nailW: 18 },
-  { i: 1, x: 154, y: 198, len: 88, w0: 26, w1: 20, rot: -6, nailW: 17 },
-  { i: 2, x: 178, y: 192, len: 100, w0: 28, w1: 21, rot: 0, nailW: 18 },
-  { i: 3, x: 202, y: 198, len: 90, w0: 26, w1: 20, rot: 6, nailW: 17 },
-  { i: 4, x: 224, y: 210, len: 68, w0: 22, w1: 17, rot: 14, nailW: 14 },
+  { i: 0, x: 140, y: 248, len: 74, w0: 26, w1: 19, rot: -36, nailW: 16 },
+  { i: 1, x: 154, y: 198, len: 90, w0: 22, w1: 17, rot: -6, nailW: 15 },
+  { i: 2, x: 178, y: 192, len: 102, w0: 24, w1: 18, rot: 0, nailW: 16 },
+  { i: 3, x: 202, y: 198, len: 92, w0: 22, w1: 17, rot: 6, nailW: 15 },
+  { i: 4, x: 224, y: 210, len: 70, w0: 19, w1: 15, rot: 14, nailW: 13 },
 ]
 
 /** nail base sits this far back on the fingertip pad */
@@ -59,15 +59,15 @@ function fingerCapsule(len: number, w0: number, w1: number) {
 
 function palmPath() {
   return [
-    "M 140 200",
-    "C 136 188 160 182 180 180",
-    "C 202 178 224 184 238 196",
-    "C 250 206 254 224 252 244",
-    "C 250 268 242 292 228 304",
-    "C 216 314 194 318 176 318",
-    "C 158 318 144 312 136 300",
-    "C 126 284 124 260 128 240",
-    "C 130 220 134 208 140 200",
+    "M 144 200",
+    "C 140 190 162 184 180 182",
+    "C 200 180 220 184 232 194",
+    "C 242 202 246 220 244 240",
+    "C 242 262 234 286 220 298",
+    "C 208 308 190 312 176 312",
+    "C 162 312 150 306 142 296",
+    "C 134 282 132 260 134 240",
+    "C 136 220 140 208 144 200",
     "Z",
   ].join(" ")
 }
@@ -374,7 +374,7 @@ function HandArt({
             </g>
           ))}
         <path d={palmPath()} fill={skin} />
-        <ellipse cx="140" cy="252" rx="18" ry="22" fill={skin} />
+        <ellipse cx="140" cy="252" rx="14" ry="18" fill={skin} />
         <g transform={`translate(${FINGERS[0]!.x} ${FINGERS[0]!.y}) rotate(${FINGERS[0]!.rot})`}>
           <path d={fingerCapsule(FINGERS[0]!.len, FINGERS[0]!.w0, FINGERS[0]!.w1)} fill={skin} />
         </g>
