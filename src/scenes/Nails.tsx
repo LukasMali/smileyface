@@ -57,57 +57,39 @@ function fingerCapsule(len: number, w0: number, w1: number) {
   ].join(" ")
 }
 
-function palmPath() {
-  return [
-    "M 144 200",
-    "C 140 190 162 184 180 182",
-    "C 200 180 220 184 232 194",
-    "C 242 202 246 220 244 240",
-    "C 242 262 234 286 220 298",
-    "C 208 308 190 312 176 312",
-    "C 162 312 150 306 142 296",
-    "C 134 282 128 260 127 244",
-    "C 124 228 128 212 144 200",
-    "Z",
-  ].join(" ")
+function thumbWorld(lx: number, ly: number) {
+  const th = FINGERS[0]!
+  const r = (th.rot * Math.PI) / 180
+  const c = Math.cos(r)
+  const s = Math.sin(r)
+  return [th.x + lx * c - ly * s, th.y + lx * s + ly * c] as const
 }
 
-/** thumb grows out of the palm: deep root, inner thenar flare, outer shaft widen */
-function thumbPath(len: number, w0: number, w1: number) {
-  const b = w0 / 2
-  const t = w1 / 2
-  const yTip = -len + w1 * 0.42
-  const f = (v: number) => v.toFixed(1)
-  return [
-    `M ${f(-b)} 52`,
-    `C ${f(-b - 2)} 28 ${f(-b - 5)} ${f(-len * 0.08)} ${f(-b - 5)} ${f(-len * 0.28)}`,
-    `C ${f(-b - 2)} ${f(-len * 0.55)} ${f(-t)} ${f(-len * 0.78)} ${f(-t)} ${f(yTip)}`,
-    `A ${f(t)} ${f(t)} 0 0 1 ${f(t)} ${f(yTip)}`,
-    `C ${f(t)} ${f(-len * 0.78)} ${f(t + 1)} ${f(-len * 0.5)} ${f(b + 2)} ${f(-len * 0.08)}`,
-    `C ${f(b + 10)} 16 ${f(b + 16)} 38 ${f(b + 4)} 54`,
-    `C ${f(2)} 58 ${f(-b + 4)} 56 ${f(-b)} 52`,
-    "Z",
-  ].join(" ")
+function pt(lx: number, ly: number) {
+  const [x, y] = thumbWorld(lx, ly)
+  return `${x.toFixed(1)} ${y.toFixed(1)}`
 }
 
-/** rounded web between thumb and index */
-function thumbWebPath() {
+/** palm + thumb as one silhouette so the left edge cannot grow extra lumps */
+function palmAndThumbPath() {
+  const th = FINGERS[0]!
+  const b = th.w0 / 2
+  const t = th.w1 / 2
+  const yTip = -th.len + th.w1 * 0.42
+  const k = t * 0.55
   return [
-    "M 142 210",
-    "C 134 222 134 238 144 246",
-    "C 154 248 162 236 160 222",
-    "C 158 210 152 206 142 210",
-    "Z",
-  ].join(" ")
-}
-
-/** fills the small outer step where the thumb shaft meets the palm */
-function thumbOuterBlend() {
-  return [
-    "M 124 236",
-    "C 118 248 118 264 126 276",
-    "C 134 268 136 252 130 242",
-    "C 128 236 126 234 124 236",
+    "M 156 304",
+    "C 174 313 204 313 222 304",
+    "C 234 296 242 274 243 250",
+    "C 242 226 234 208 222 200",
+    "C 210 193 198 187 184 185",
+    "C 170 183 158 189 150 200",
+    `C 143 214 139 226 ${pt(b * 0.75, -th.len * 0.22)}`,
+    `C ${pt(t + 0.4, -th.len * 0.58)} ${pt(t, -th.len * 0.82)} ${pt(t, yTip)}`,
+    `C ${pt(t, yTip - k)} ${pt(k, yTip - t)} ${pt(0, yTip - t)}`,
+    `C ${pt(-k, yTip - t)} ${pt(-t, yTip - k)} ${pt(-t, yTip)}`,
+    `C ${pt(-t - 0.4, -th.len * 0.58)} ${pt(-b, -th.len * 0.2)} ${pt(-b, 0)}`,
+    "C 137 268 146 288 156 304",
     "Z",
   ].join(" ")
 }
@@ -408,12 +390,7 @@ function HandArt({
               <path d={fingerCapsule(f.len, f.w0, f.w1)} />
             </g>
           ))}
-        <path d={palmPath()} />
-        <path d={thumbWebPath()} />
-        <path d={thumbOuterBlend()} />
-        <g transform={`translate(${FINGERS[0]!.x} ${FINGERS[0]!.y}) rotate(${FINGERS[0]!.rot})`}>
-          <path d={thumbPath(FINGERS[0]!.len, FINGERS[0]!.w0, FINGERS[0]!.w1)} />
-        </g>
+        <path d={palmAndThumbPath()} />
       </g>
 
       {FINGERS.map((f) => renderFinger(f))}
