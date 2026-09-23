@@ -216,6 +216,40 @@ input[type="range"] {
   min-height: 44px;
 }
 
+/* icon-only HUD pills: square circle so the glyph sits in the true center on phones */
+.hud-round {
+  display: inline-grid;
+  grid-auto-flow: column;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  gap: 0;
+  border-radius: 9999px;
+  border: 1.5px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
+  background: #fff;
+  color: var(--color-ink);
+  font-family: var(--font-hand), "Baloo 2", sans-serif;
+  font-size: 0.875rem;
+  line-height: 1;
+  box-shadow: 0 6px 12px -10px rgba(91, 68, 80, 0.9);
+  transition: transform 0.12s ease;
+}
+.hud-round:active {
+  transform: scale(0.95);
+}
+@media (min-width: 460px) {
+  .hud-round {
+    display: inline-flex;
+    width: auto;
+    height: auto;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    padding: 0.375rem 0.75rem;
+  }
+}
+
 .grain {
   pointer-events: none;
   position: fixed;

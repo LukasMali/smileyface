@@ -4,9 +4,9 @@ import { useGame } from "../hooks/GameContext"
 export function ToastLayer() {
   const { toasts } = useGame()
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-[5.4rem] z-[80] flex flex-col items-center gap-2 px-4 sm:bottom-24">
+    <div className="pointer-events-none fixed inset-x-0 bottom-[5.4rem] z-[80] flex flex-col items-center gap-1.5 px-4 sm:bottom-24">
       <AnimatePresence>
-        {toasts.map((t) => (
+        {toasts.slice(-3).map((t) => (
           <motion.p
             key={t.id}
             initial={{ opacity: 0, y: 18, scale: 0.9 }}

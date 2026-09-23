@@ -118,7 +118,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   const notify = useCallback((text: string, kind: Toast["kind"] = "plain") => {
     const id = ++toastId
-    setToasts((prev) => [...prev.slice(-3), { id, text, kind }])
+    setToasts((prev) => [...prev, { id, text, kind }].slice(-3))
     const t = window.setTimeout(() => {
       setToasts((prev) => prev.filter((x) => x.id !== id))
     }, kind === "achieve" ? 3200 : 2400)

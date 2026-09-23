@@ -262,7 +262,14 @@ export function Nini() {
           <GameButton tone={spot.pose === "sleep" ? "mint" : "cream"} onClick={() => update({ ...spot, pose: "sleep" })}>
             sleeping pose
           </GameButton>
-          <GameButton tone={spot.pose === "stretch" ? "mint" : "cream"} onClick={() => update({ ...spot, pose: "stretch" })}>
+          <GameButton
+            tone={spot.pose === "stretch" ? "mint" : "cream"}
+            onClick={() => {
+              const next = spot.pose === "stretch" ? "sit" : "stretch"
+              update({ ...spot, pose: next }, "sparkle")
+              notify(next === "stretch" ? "front paws: deployed. spine: spaghetti." : "stretch complete. core: unlocked.")
+            }}
+          >
             stretch
           </GameButton>
         </div>

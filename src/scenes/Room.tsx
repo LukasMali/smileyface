@@ -186,17 +186,14 @@ export function Room() {
         </Hotspot>
 
         {/* wall shelf with everything she has collected */}
-        <div className="absolute top-[18%] right-[27%] left-[20%] h-[12%]">
+        <div className="absolute top-[16%] right-[20%] left-[18%] h-[14%]">
           <div className="absolute inset-x-0 bottom-0 h-[5px] rounded-full bg-[#d9b894] shadow-[0_4px_8px_-3px_rgba(91,68,80,0.7)]" />
-          <div
-            className="absolute inset-x-1 bottom-[5px] flex origin-bottom items-end justify-center gap-0.5"
-            style={{ transform: `translateY(12%) scale(${shelf.length > 8 ? 0.6 : shelf.length > 6 ? 0.76 : 1})` }}
-          >
+          <div className="absolute inset-x-1 bottom-[5px] flex items-end justify-center gap-px overflow-hidden">
             {shelf.map((item) => (
               <motion.button
                 key={item.id}
                 type="button"
-                className="hit-area border-0 bg-transparent p-0"
+                className="flex min-w-0 flex-1 items-end justify-center overflow-hidden border-0 bg-transparent p-0"
                 aria-label={item.label}
                 whileHover={{ y: -4, rotate: 3 }}
                 whileTap={{ scale: 0.92 }}
@@ -205,7 +202,9 @@ export function Room() {
                   notify(item.label)
                 }}
               >
-                <ShelfBit id={item.id} />
+                <span className="flex w-full max-w-[28px] items-end justify-center [&_svg]:h-auto [&_svg]:w-full">
+                  <ShelfBit id={item.id} />
+                </span>
               </motion.button>
             ))}
             {shelf.length === 0 && (
@@ -254,17 +253,8 @@ export function Room() {
           <HeadphonesArt on={save.headphonesOn} />
         </Hotspot>
 
-        <Hotspot x="83%" b="13%" w="8%" label="PC power button" testid="power-btn" onClick={startPc}>
-          <span
-            className={`inline-flex h-8 w-8 items-center justify-center rounded-full border-2 ${
-              save.bootDone ? "border-mint-deep bg-mint" : "border-blush-deep bg-blush"
-            }`}
-          >
-            <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden>
-              <path d="M8 2v5" stroke="#5b4450" strokeWidth="2" strokeLinecap="round" />
-              <path d="M4.6 4.6a4.8 4.8 0 1 0 6.8 0" fill="none" stroke="#5b4450" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-          </span>
+        <Hotspot x="90.5%" b="10%" w="5.5%" z={20} compact label="PC power button" testid="power-btn" onClick={startPc}>
+          <span className="block h-7 w-full" aria-hidden />
         </Hotspot>
 
         <Hotspot
@@ -284,9 +274,12 @@ export function Room() {
         </Hotspot>
 
         <Hotspot
-          x="59%"
-          b="33%"
-          w="8%"
+          x="56%"
+          b="34.5%"
+          w="7%"
+          z={30}
+          compact
+          align="end"
           label="sparkly mouse"
           testid="mouse"
           onClick={() => {
@@ -294,7 +287,9 @@ export function Room() {
             discoverSecret("desk-mouse", "the mouse knows things")
           }}
         >
-          <MouseArt />
+          <span className="mb-0.5 block h-[22px] w-[15px] sm:h-[26px] sm:w-[18px]">
+            <MouseArt />
+          </span>
         </Hotspot>
 
         <Hotspot
@@ -334,11 +329,11 @@ export function Room() {
           </Hotspot>
         )}
 
-        <div className="absolute right-[26%] bottom-[4%] z-20">
+        <div className="absolute right-[3%] bottom-[1%] z-[15] max-[459px]:right-[1%] max-[459px]:origin-bottom-right max-[459px]:scale-[0.82]">
           <motion.button
             type="button"
             aria-label="pet Nikki"
-            className="hit-area border-0 bg-transparent p-0"
+            className="border-0 bg-transparent p-0"
             data-testid="room-nini"
             whileTap={{ scale: 0.94 }}
             whileHover={reducedMotion ? undefined : { y: -4 }}
@@ -348,7 +343,7 @@ export function Room() {
               notify(line)
             }}
           >
-            <Nikki pose={night ? "sleep" : save.happiness > 50 ? "sit" : "stand"} size={104} />
+            <Nikki pose={night ? "sleep" : save.happiness > 50 ? "sit" : "stand"} size={86} />
           </motion.button>
         </div>
 
@@ -425,6 +420,9 @@ function Hotspot({
   onClick,
   children,
   testid,
+  compact,
+  z = 10,
+  align = "start",
 }: {
   x: string
   /** distance from the top of the stage */
@@ -436,14 +434,19 @@ function Hotspot({
   onClick: () => void
   children: React.ReactNode
   testid?: string
+  compact?: boolean
+  z?: number
+  align?: "start" | "end" | "center"
 }) {
   return (
     <motion.button
       type="button"
       data-testid={testid}
       aria-label={label}
-      className="hit-area absolute z-10 flex items-end border-0 bg-transparent p-0"
-      style={{ left: x, top: y, bottom: b, width: w }}
+      className={`absolute flex items-end border-0 bg-transparent p-0 ${
+        compact ? "min-h-0 min-w-0" : "hit-area"
+      } ${align === "end" ? "justify-end" : align === "center" ? "justify-center" : "justify-start"}`}
+      style={{ left: x, top: y, bottom: b, width: w, zIndex: z }}
       whileHover={{ y: -3, scale: 1.03 }}
       whileTap={{ scale: 0.95 }}
       transition={{ type: "spring", stiffness: 420, damping: 24 }}
@@ -545,7 +548,10 @@ function PcTower({ glow, on }: { glow: string; on: boolean }) {
         </>
       )}
       <rect x="22" y="108" width="52" height="7" rx="3.5" fill="#8fddb4" />
-      <rect x="22" y="120" width="22" height="7" rx="3.5" fill="#fff" opacity="0.9" />
+      <rect x="22" y="120" width="18" height="7" rx="3.5" fill="#fff" opacity="0.9" />
+      <circle cx="68" cy="123.5" r="5.1" fill={on ? "#6ee0b0" : "#f3c9d4"} stroke="#5b4450" strokeWidth="1.5" />
+      <path d="M68 120.6v3.4" stroke="#5b4450" strokeWidth="1.35" strokeLinecap="round" />
+      <path d="M65.7 122.4a2.7 2.7 0 1 0 4.6 0" fill="none" stroke="#5b4450" strokeWidth="1.25" strokeLinecap="round" />
       <path d="M16 12c4-3 10-4 16-4" stroke="#fff" strokeWidth="2.4" opacity="0.7" fill="none" />
     </svg>
   )
@@ -596,7 +602,7 @@ function Keyboard({ lit }: { lit: number }) {
 
 function MouseArt() {
   return (
-    <svg viewBox="0 0 44 60" className="w-full" aria-hidden>
+    <svg viewBox="0 0 44 60" className="h-full w-full" aria-hidden>
       <rect x="7" y="4" width="30" height="50" rx="15" fill="#efe0fb" stroke="#5b4450" strokeWidth="2.2" />
       <path d="M22 8v18" stroke="#bfa9f0" strokeWidth="2.4" strokeLinecap="round" />
       <ellipse cx="22" cy="30" rx="4" ry="6" fill="#bfa9f0" opacity="0.5" />
@@ -640,32 +646,32 @@ function Mug() {
 function ShelfBit({ id }: { id: string }) {
   switch (id) {
     case "alien":
-      return <MrAlien size={42} mode="peek" />
+      return <MrAlien size={26} mode="peek" />
     case "santa":
-      return <SantaArt size={40} />
+      return <SantaArt size={24} />
     case "nikki":
-      return <Nikki pose="sit" size={44} animated={false} />
+      return <Nikki pose="sit" size={26} animated={false} />
     case "pool-trophy":
-      return <Trophy size={32} />
+      return <Trophy size={20} />
     case "fruit":
-      return <FruitBasket size={36} />
+      return <FruitBasket size={22} />
     case "cactus":
-      return <CactusIceCream size={34} body="#ff8fae" spots="#fff" />
+      return <CactusIceCream size={22} body="#ff8fae" spots="#fff" />
     case "burger":
-      return <BurgerArt size={38} />
+      return <BurgerArt size={22} />
     case "nails":
-      return <NailPolish size={26} />
+      return <NailPolish size={16} />
     case "pudding":
-      return <PuddingCup size={30} />
+      return <PuddingCup size={18} />
     case "licence":
-      return <Licence size={38} />
+      return <Licence size={22} />
     case "nurse-badge":
-      return <NurseBadge size={30} />
+      return <NurseBadge size={18} />
     case "meal":
-      return <LegendaryPlate size={50} />
+      return <LegendaryPlate size={26} />
     case "gift":
-      return <GiftBox size={32} />
+      return <GiftBox size={20} />
     default:
-      return <Coin size={22} />
+      return <Coin size={14} />
   }
 }

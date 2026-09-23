@@ -15,23 +15,20 @@ export function HUD({ onOpenSettings }: { onOpenSettings: () => void }) {
         {!atRoom && (
           <button
             type="button"
-            className="hit-area flex items-center gap-1 rounded-full border-[1.5px] border-ink/10 bg-white px-3 py-1.5 font-hand text-sm shadow-[0_6px_12px_-10px_rgba(91,68,80,0.9)] transition-transform active:scale-95 max-[459px]:px-2"
+            className="hud-round"
             onClick={() => {
               play("click")
               nav("/room")
             }}
             aria-label="back to room"
           >
-            <ArrowIcon /> <span className="max-[459px]:hidden">room</span>
+            <ArrowIcon />
+            <span className="max-[459px]:hidden">room</span>
           </button>
         )}
-        <Link
-          to="/world"
-          aria-label="map"
-          className="hit-area flex items-center gap-1 rounded-full border-[1.5px] border-ink/10 bg-white px-3 py-1.5 font-hand text-sm text-ink no-underline shadow-[0_6px_12px_-10px_rgba(91,68,80,0.9)] max-[459px]:px-2"
-          onClick={() => play("click")}
-        >
-          <MapIcon /> <span className="max-[459px]:hidden">map</span>
+        <Link to="/world" aria-label="map" className="hud-round no-underline" onClick={() => play("click")}>
+          <MapIcon />
+          <span className="max-[459px]:hidden">map</span>
         </Link>
       </div>
 
@@ -208,7 +205,7 @@ function CoinIcon({ size = 14 }: { size?: number }) {
 
 function MapIcon({ size = 15 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 20 20" aria-hidden>
+    <svg width={size} height={size} viewBox="0 0 20 20" className="block" aria-hidden>
       <path d="M2.5 5.5l5-2 5 2 5-2v13l-5 2-5-2-5 2z" fill="#d3f4e0" stroke="#5b4450" strokeWidth="1.3" strokeLinejoin="round" />
       <path d="M7.5 3.5v13M12.5 5.5v13" stroke="#5b4450" strokeWidth="1.1" opacity="0.6" />
     </svg>
@@ -245,10 +242,10 @@ function GearIcon({ size = 16 }: { size?: number }) {
   )
 }
 
-function ArrowIcon({ size = 13 }: { size?: number }) {
+function ArrowIcon({ size = 14 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 16 16" aria-hidden>
-      <path d="M10 3L5 8l5 5" fill="none" stroke="#5b4450" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    <svg width={size} height={size} viewBox="0 0 16 16" className="block" aria-hidden>
+      <path d="M9.8 3.2 4.8 8l5 4.8" fill="none" stroke="#5b4450" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }
