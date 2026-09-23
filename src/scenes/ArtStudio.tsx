@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState, type PointerEvent } from "rea
 import { ART_KEY } from "../game/types"
 import { useGame } from "../hooks/GameContext"
 import { GameButton, Panel, Pill } from "../ui/Button"
+import { ColorWheel } from "../ui/ColorWheel"
 import { PageShell } from "../ui/PageShell"
 
 const CW = 1000
@@ -303,40 +304,13 @@ export function ArtStudio() {
               }}
             />
           ))}
-          <label
-            className={`relative h-9 w-9 shrink-0 cursor-pointer rounded-full border-[2.5px] transition-transform ${
-              COLORS.includes(color.toLowerCase())
-                ? "border-ink/12"
-                : "scale-110 border-ink shadow-[0_0_0_3px_rgba(255,255,255,0.9)]"
-            }`}
-            title="choose your own color"
-          >
-            <span
-              className="pointer-events-none absolute inset-[3px] rounded-full"
-              style={{
-                background: COLORS.includes(color.toLowerCase())
-                  ? "conic-gradient(#ff8fae, #ffd45e, #8fddb4, #8fcbec, #bfa9f0, #ff8fae)"
-                  : color,
-              }}
-            />
-            {COLORS.includes(color.toLowerCase()) && (
-              <span className="pointer-events-none absolute inset-0 flex items-center justify-center font-hand text-lg leading-none text-ink">
-                +
-              </span>
-            )}
-            <input
-              type="color"
-              data-testid="custom-color"
-              aria-label="choose your own color"
-              value={COLORS.includes(color.toLowerCase()) ? "#ff8fae" : color}
-              onChange={(e) => {
-                setColor(e.target.value)
-                if (tool === "eraser") setTool("brush")
-                play("click")
-              }}
-              className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-            />
-          </label>
+          <ColorWheel
+            color={color}
+            onPick={(hex) => {
+              setColor(hex)
+              if (tool === "eraser") setTool("brush")
+            }}
+          />
         </div>
 
         <div className="mt-3 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">

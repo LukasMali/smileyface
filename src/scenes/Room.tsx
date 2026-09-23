@@ -308,8 +308,8 @@ export function Room() {
           <Chair night={night} />
         </Hotspot>
 
-        <Hotspot x="70%" b="34.5%" w="5%" compact label="hot chocolate" onClick={() => { play("pop"); notify("hot chocolate. the correct drink.") }}>
-          <span className="mx-auto mb-0.5 block h-[22px] w-[22px] sm:h-8 sm:w-8">
+        <Hotspot x="68%" b="33%" w="9%" compact label="hot chocolate" onClick={() => { play("pop"); notify("hot chocolate. the correct drink.") }}>
+          <span className="mx-auto mb-0.5 block h-[22px] w-[22px] sm:h-16 sm:w-16">
             <Mug />
           </span>
         </Hotspot>

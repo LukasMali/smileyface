@@ -48,10 +48,10 @@ export function ComedyLayer() {
   // Windows / the browser has prefers-reduced-motion turned on
   useEffect(() => {
     const spawn = () => setTick({ id: ++seq.current, kind: pick(EVENTS) })
-    const first = window.setTimeout(spawn, 5000)
+    const first = window.setTimeout(spawn, 22000)
     const t = window.setInterval(() => {
-      if (comedyRef.current < 6 || chance(0.55)) spawn()
-    }, 12000)
+      if (comedyRef.current < 3 || chance(0.32)) spawn()
+    }, 36000)
     return () => {
       window.clearTimeout(first)
       window.clearInterval(t)

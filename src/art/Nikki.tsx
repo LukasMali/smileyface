@@ -297,38 +297,58 @@ function SleepingNikki({ id, harness, animated }: { id: string; harness: boolean
   const cream = `url(#${id}-cream)`
   return (
     <g>
-      <ellipse cx="134" cy="152" rx="92" ry="11" fill="#5b4450" opacity="0.14" />
-      <g className={animated ? "anim-breathe" : undefined} style={{ transformOrigin: "134px 120px" }}>
-        {/* curled fluffy body */}
-        <FurBlob cx={140} cy={104} rx={62} ry={38} lobes={16} bulge={0.09} seed={4} fill={coat} />
-        <path d="M96 84c26-16 66-18 96-6" stroke={COAT_LIGHT} strokeWidth="3.4" fill="none" opacity="0.45" strokeLinecap="round" />
-        {harness && <path d="M128 82c22 11 46 11 66 1" stroke={`url(#${id}-harness)`} strokeWidth="8" fill="none" strokeLinecap="round" />}
+      <ellipse cx="148" cy="154" rx="88" ry="10" fill="#5b4450" opacity="0.14" />
+      <g className={animated ? "anim-breathe" : undefined} style={{ transformOrigin: "140px 118px" }}>
+        {/* curled loaf body */}
+        <FurBlob cx={152} cy={112} rx={66} ry={34} lobes={16} bulge={0.09} seed={4} fill={coat} />
+        <path d="M108 88c24-14 62-16 90-4" stroke={COAT_LIGHT} strokeWidth="3.4" fill="none" opacity="0.45" strokeLinecap="round" />
+        {harness && <path d="M128 92c24 10 52 10 74 0" stroke={`url(#${id}-harness)`} strokeWidth="8" fill="none" strokeLinecap="round" />}
 
         {/* tucked tail */}
-        <FurBlob cx={200} cy={122} rx={18} ry={13} lobes={9} bulge={0.14} seed={9} fill={coat} />
+        <FurBlob cx={214} cy={124} rx={18} ry={13} lobes={9} bulge={0.14} seed={9} fill={coat} />
 
-        {/* head resting on paws */}
+        {/* head — still the same fluffy face, just horizontal */}
         <g>
-          <path d="M66 64C56 48 54 30 60 26c7-4 20 8 26 24z" fill={coat} stroke={LINE} strokeWidth={STROKE.base} strokeLinejoin="round" />
-          <path d="M66 58c-6-10-8-17-5-20 4-2 10 6 14 16z" fill="#8f6f78" opacity="0.5" />
-          <FurBlob cx={68} cy={98} rx={33} ry={29} lobes={14} bulge={0.11} seed={6} fill={coat} />
-          <path d="M62 90c15 0 26 8 26 20s-11 19-26 19c-13 0-22-7-22-19s9-20 22-20z" fill={cream} />
-          <ellipse cx="54" cy="84" rx="6.4" ry="4.2" fill={TAN} opacity="0.85" />
-          <ellipse cx="80" cy="84" rx="6.4" ry="4.2" fill={TAN} opacity="0.85" />
-          <path d="M45 96c5 5 12 5 17 0" stroke="#241c26" strokeWidth="2.2" fill="none" strokeLinecap="round" />
-          <path d="M73 95c4 4 10 4 14 0" stroke="#241c26" strokeWidth="2.2" fill="none" strokeLinecap="round" />
-          <path d="M50 110c4.6 0 7.4 2.6 7.4 5.2 0 2.8-3.4 4.4-7.4 4.4s-7-1.6-7-4.4c0-2.6 2.6-5.2 7-5.2z" fill="#241c26" />
-          <circle cx="36" cy="106" r="6.4" fill="#ff9db5" opacity="0.3" />
-          <circle cx="80" cy="106" r="6.4" fill="#ff9db5" opacity="0.3" />
-          {/* front paw pillow */}
-          <ellipse cx="92" cy="130" rx="15" ry="9" fill={cream} stroke={LINE} strokeWidth={STROKE.base} />
+          {/* far ear, standing up behind the head so she always has two */}
+          <path
+            d="M104 92c10-28 34-46 44-30 8 14-8 30-30 36z"
+            fill={coat}
+            stroke={LINE}
+            strokeWidth={STROKE.base}
+            strokeLinejoin="round"
+          />
+          <path d="M114 78c6-14 16-20 20-12 4 8-6 16-16 20z" fill="#8f6f78" opacity="0.5" />
+          <path d="M116 74c4-10 10-14 12-8" fill="#c99aaa" opacity="0.45" />
+          {/* near ear, flopped forward beside her cheek */}
+          <path
+            d="M54 90C38 70 30 48 40 42c10-6 28 14 34 34z"
+            fill={coat}
+            stroke={LINE}
+            strokeWidth={STROKE.base}
+            strokeLinejoin="round"
+          />
+          <path d="M50 80c-10-14-12-24-6-26 6-2 14 10 18 20z" fill="#8f6f78" opacity="0.5" />
+          <path d="M46 64c-2-8 2-14 6-12" fill="#c99aaa" opacity="0.45" />
+
+          <FurBlob cx={78} cy={104} rx={36} ry={30} lobes={14} bulge={0.11} seed={6} fill={coat} />
+          <path d="M72 94c16 0 28 9 28 20s-12 18-28 18c-14 0-24-7-24-18s10-20 24-20z" fill={cream} />
+          <ellipse cx="62" cy="90" rx="7" ry="4.4" fill={TAN} opacity="0.85" />
+          <ellipse cx="90" cy="90" rx="7" ry="4.4" fill={TAN} opacity="0.85" />
+          <path d="M52 102c5 5 12 5 16 0" stroke="#241c26" strokeWidth="2.2" fill="none" strokeLinecap="round" />
+          <path d="M82 102c5 5 12 5 16 0" stroke="#241c26" strokeWidth="2.2" fill="none" strokeLinecap="round" />
+          <path d="M58 116c5 0 8 2.6 8 5.2 0 2.8-3.6 4.4-8 4.4s-7.6-1.6-7.6-4.4c0-2.6 2.8-5.2 7.6-5.2z" fill="#241c26" />
+          <circle cx="44" cy="112" r="6.4" fill="#ff9db5" opacity="0.3" />
+          <circle cx="92" cy="112" r="6.4" fill="#ff9db5" opacity="0.3" />
+          {/* two cream paws tucked under her chin */}
+          <ellipse cx="96" cy="134" rx="15" ry="9" fill={cream} stroke={LINE} strokeWidth={STROKE.base} />
+          <ellipse cx="118" cy="136" rx="13" ry="8" fill={cream} stroke={LINE} strokeWidth={STROKE.base} />
         </g>
       </g>
       <g className={animated ? "anim-float" : undefined} fill="#a48ed6">
-        <text x="112" y="44" fontFamily="Baloo 2, Nunito, sans-serif" fontSize="22" fontWeight="700">
+        <text x="124" y="46" fontFamily="Baloo 2, Nunito, sans-serif" fontSize="22" fontWeight="700">
           z
         </text>
-        <text x="136" y="24" fontFamily="Baloo 2, Nunito, sans-serif" fontSize="15" fontWeight="700" opacity="0.8">
+        <text x="148" y="28" fontFamily="Baloo 2, Nunito, sans-serif" fontSize="15" fontWeight="700" opacity="0.8">
           z
         </text>
       </g>

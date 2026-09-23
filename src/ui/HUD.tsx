@@ -1,10 +1,11 @@
 import { useEffect, useState, type ReactNode } from "react"
 import { motion } from "framer-motion"
 import { Link, useLocation, useNavigate } from "react-router-dom"
+import { pick } from "../lib/random"
 import { useGame } from "../hooks/GameContext"
 
 export function HUD({ onOpenSettings }: { onOpenSettings: () => void }) {
-  const { save, happiness, play } = useGame()
+  const { save, happiness, play, notify } = useGame()
   const loc = useLocation()
   const nav = useNavigate()
   const atRoom = loc.pathname === "/room" || loc.pathname === "/"
@@ -33,13 +34,35 @@ export function HUD({ onOpenSettings }: { onOpenSettings: () => void }) {
       </div>
 
       <div className="flex min-w-0 items-center gap-1.5 max-[459px]:gap-1">
-        <Chip testid="stars" label={`${save.stars} stars`} tone="bg-butter">
+        <Chip
+          testid="stars"
+          label={`${save.stars} stars`}
+          tone="bg-butter"
+          onClick={() => {
+            play("sparkle")
+            notify(pick(STAR_LINES))
+          }}
+        >
           <StarIcon /> {save.stars}
         </Chip>
-        <Chip testid="coins" label={`${save.coins} coins`} tone="bg-mint">
+        <Chip
+          testid="coins"
+          label={`${save.coins} coins`}
+          tone="bg-mint"
+          onClick={() => {
+            play("coin")
+            notify(pick(COIN_LINES))
+          }}
+        >
           <CoinIcon /> {save.coins}
         </Chip>
-        <HappinessChip value={happiness} />
+        <HappinessChip
+          value={happiness}
+          onClick={() => {
+            play("chime")
+            notify(pick(HAPPY_LINES))
+          }}
+        />
         <button
           type="button"
           className="hit-area flex items-center justify-center rounded-full border-[1.5px] border-ink/10 bg-white px-2.5 py-2 shadow-[0_6px_12px_-10px_rgba(91,68,80,0.9)] transition-transform active:scale-95"
@@ -57,32 +80,63 @@ export function HUD({ onOpenSettings }: { onOpenSettings: () => void }) {
   )
 }
 
+const STAR_LINES = [
+  "stars. legally distinct from snacks, unfortunately",
+  "tiny sparkly currency. do not eat. we checked",
+  "you earned these by being unreasonably charming",
+  "star inventory: cute and non-refundable",
+] as const
+
+const COIN_LINES = [
+  "coins. Mr Alien would like a word",
+  "this is the official shiny round food",
+  "gold, but make it emotionally supportive",
+  "wallet status: a little jingle, a lot of pride",
+] as const
+
+const HAPPY_LINES = [
+  "the official vibe meter. currently doing its best",
+  "happiness, but as a pie chart. very scientific",
+  "this bar fills when you do silly kind things",
+  "progress: being alive and slightly sparkly",
+] as const
+
 function Chip({
   children,
   testid,
   label,
   tone,
+  onClick,
 }: {
   children: ReactNode
   testid: string
   label: string
   tone: string
+  onClick: () => void
 }) {
   return (
-    <span data-testid={testid} aria-label={label} className={`pill ${tone} px-2 text-[0.82rem]`}>
+    <button
+      type="button"
+      data-testid={testid}
+      aria-label={label}
+      className={`pill ${tone} cursor-pointer px-2 text-[0.82rem]`}
+      onClick={onClick}
+    >
       {children}
-    </span>
+    </button>
   )
 }
 
-function HappinessChip({ value }: { value: number }) {
+function HappinessChip({ value, onClick }: { value: number; onClick: () => void }) {
   const r = 9
   const c = 2 * Math.PI * r
   return (
-    <span
+    <button
+      type="button"
       data-testid="happiness"
       aria-label={`happiness ${value} percent`}
-      className="pill bg-blush gap-1.5 px-2 text-[0.82rem]"
+      className="pill cursor-pointer bg-blush gap-1.5 px-2 text-[0.82rem]"
+      onClick={onClick}
     >
       <span className="relative inline-flex h-[22px] w-[22px] items-center justify-center">
         <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden>
@@ -104,7 +158,7 @@ function HappinessChip({ value }: { value: number }) {
         </svg>
       </span>
       <span className="max-[359px]:hidden">{value}%</span>
-    </span>
+    </button>
   )
 }
 

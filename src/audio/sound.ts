@@ -129,34 +129,73 @@ export function playSound(name: SoundName) {
 }
 
 let ambNodes: { osc: OscillatorNode; g: GainNode }[] = []
+let ambTimers: number[] = []
+let ambStep = 0
+let ambRunning = false
+
+const TUNE = [659, 784, 880, 784, 988, 880, 784, 659, 523, 659, 784, 988]
+
+function clearAmbTimers() {
+  ambTimers.forEach((id) => {
+    window.clearTimeout(id)
+    window.clearInterval(id)
+  })
+  ambTimers = []
+}
 
 export function startAmbient() {
   if (!enabled) return
   unlockAudio()
   stopAmbient()
+  ambRunning = true
+  ambStep = 0
   const c = getCtx()
-  const notes = [196, 247, 294, 330]
-  ambNodes = notes.map((f, i) => {
+
+  const pads: { osc: OscillatorNode; g: GainNode }[] = []
+  ;[196, 294].forEach((f, i) => {
     const osc = c.createOscillator()
     const g = c.createGain()
     osc.type = "sine"
     osc.frequency.value = f
-    g.gain.value = 0.012 * master
+    g.gain.value = 0.006 * master
     osc.connect(g)
     g.connect(c.destination)
     osc.start()
     const lfo = c.createOscillator()
     const lg = c.createGain()
-    lfo.frequency.value = 0.08 + i * 0.03
-    lg.gain.value = 0.006
+    lfo.frequency.value = 0.11 + i * 0.04
+    lg.gain.value = 0.003
     lfo.connect(lg)
     lg.connect(g.gain)
     lfo.start()
-    return { osc, g }
+    pads.push({ osc, g }, { osc: lfo, g: lg })
   })
+  ambNodes = pads
+
+  const step = () => {
+    if (!ambRunning || !enabled) return
+    const i = ambStep % TUNE.length
+    const f = TUNE[i] ?? 659
+    tone(f, i % 4 === 3 ? 0.28 : 0.16, "triangle", 0.05)
+    if (i % 4 === 0) tone(262, 0.22, "sine", 0.018)
+    if (i === 5 || i === 11) tone(1318, 0.12, "sine", 0.028)
+    ambStep += 1
+    const wait = i === TUNE.length - 1 ? 640 : 240
+    ambTimers.push(window.setTimeout(step, wait))
+  }
+  ambTimers.push(window.setTimeout(step, 180))
+
+  const blub = () => {
+    if (!ambRunning || !enabled) return
+    tone(420 + Math.random() * 180, 0.14, "sine", 0.03, 0, 160)
+    ambTimers.push(window.setTimeout(blub, 4200 + Math.random() * 3800))
+  }
+  ambTimers.push(window.setTimeout(blub, 2800))
 }
 
 export function stopAmbient() {
+  ambRunning = false
+  clearAmbTimers()
   ambNodes.forEach((n) => {
     try {
       n.osc.stop()
