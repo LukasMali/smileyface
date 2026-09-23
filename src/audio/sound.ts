@@ -132,8 +132,16 @@ let ambNodes: { osc: OscillatorNode; g: GainNode }[] = []
 let ambTimers: number[] = []
 let ambRunning = false
 
-const SCALE = [392, 440, 494, 523, 587, 659, 698, 784, 880, 988]
-const PADS = [174, 196, 220, 247, 262, 294]
+/** quarter-note length; ~88 bpm keeps the music box unhurried */
+const Q = 60 / 88
+
+type Hit = { f: number; q: number }
+
+type Song = {
+  pad: [number, number]
+  phrases: Hit[][]
+  bass: [number, number][]
+}
 
 function clearAmbTimers() {
   ambTimers.forEach((id) => {
@@ -143,8 +151,143 @@ function clearAmbTimers() {
   ambTimers = []
 }
 
-function ambPick<T>(items: readonly T[]) {
-  return items[Math.floor(Math.random() * items.length)] as T
+const SONGS: Song[] = [
+  {
+    pad: [131, 196],
+    phrases: [
+      [
+        { f: 659, q: 0.5 },
+        { f: 659, q: 0.5 },
+        { f: 587, q: 0.5 },
+        { f: 523, q: 0.5 },
+        { f: 392, q: 1 },
+        { f: 659, q: 0.5 },
+        { f: 784, q: 0.5 },
+        { f: 880, q: 0.5 },
+        { f: 784, q: 0.5 },
+        { f: 659, q: 0.5 },
+        { f: 587, q: 0.5 },
+        { f: 523, q: 2 },
+      ],
+      [
+        { f: 784, q: 0.5 },
+        { f: 880, q: 0.5 },
+        { f: 784, q: 0.5 },
+        { f: 659, q: 0.5 },
+        { f: 587, q: 0.5 },
+        { f: 659, q: 0.5 },
+        { f: 523, q: 1 },
+        { f: 587, q: 0.5 },
+        { f: 659, q: 0.5 },
+        { f: 784, q: 0.5 },
+        { f: 659, q: 0.5 },
+        { f: 587, q: 0.5 },
+        { f: 523, q: 0.5 },
+        { f: 0, q: 1 },
+      ],
+    ],
+    bass: [
+      [131, 196],
+      [175, 131],
+    ],
+  },
+  {
+    pad: [196, 294],
+    phrases: [
+      [
+        { f: 587, q: 0.5 },
+        { f: 494, q: 0.5 },
+        { f: 587, q: 0.5 },
+        { f: 784, q: 0.5 },
+        { f: 880, q: 0.5 },
+        { f: 784, q: 0.5 },
+        { f: 659, q: 0.5 },
+        { f: 587, q: 0.5 },
+        { f: 494, q: 0.5 },
+        { f: 587, q: 0.5 },
+        { f: 659, q: 0.5 },
+        { f: 784, q: 0.5 },
+        { f: 587, q: 2 },
+      ],
+      [
+        { f: 784, q: 0.5 },
+        { f: 880, q: 0.5 },
+        { f: 988, q: 0.5 },
+        { f: 880, q: 0.5 },
+        { f: 784, q: 0.5 },
+        { f: 659, q: 0.5 },
+        { f: 587, q: 0.5 },
+        { f: 494, q: 0.5 },
+        { f: 440, q: 0.5 },
+        { f: 494, q: 0.5 },
+        { f: 587, q: 0.5 },
+        { f: 494, q: 0.5 },
+        { f: 392, q: 2 },
+      ],
+    ],
+    bass: [
+      [196, 294],
+      [220, 196],
+    ],
+  },
+  {
+    pad: [131, 196],
+    phrases: [
+      [
+        { f: 523, q: 0.5 },
+        { f: 659, q: 0.5 },
+        { f: 784, q: 0.5 },
+        { f: 659, q: 0.5 },
+        { f: 587, q: 0.5 },
+        { f: 523, q: 0.5 },
+        { f: 440, q: 0.5 },
+        { f: 392, q: 0.5 },
+        { f: 659, q: 0.5 },
+        { f: 784, q: 0.5 },
+        { f: 659, q: 0.5 },
+        { f: 587, q: 0.5 },
+        { f: 523, q: 2 },
+      ],
+      [
+        { f: 440, q: 0.5 },
+        { f: 523, q: 0.5 },
+        { f: 659, q: 0.5 },
+        { f: 880, q: 0.5 },
+        { f: 784, q: 0.5 },
+        { f: 659, q: 0.5 },
+        { f: 587, q: 0.5 },
+        { f: 523, q: 0.5 },
+        { f: 392, q: 0.5 },
+        { f: 440, q: 0.5 },
+        { f: 523, q: 0.5 },
+        { f: 587, q: 0.5 },
+        { f: 659, q: 2 },
+      ],
+    ],
+    bass: [
+      [131, 165],
+      [175, 196],
+    ],
+  },
+]
+
+const FORM = [0, 0, 1, 0]
+
+function schedulePhrase(melody: Hit[], bass: [number, number]) {
+  let t = 0
+  for (const hit of melody) {
+    if (hit.f > 0) {
+      const dur = hit.q * Q * 0.9 + 0.05
+      tone(hit.f, dur, "triangle", 0.05, t)
+      if (hit.q >= 1) tone(hit.f * 2, Math.min(0.22, dur * 0.45), "sine", 0.016, t + 0.03)
+    }
+    t += hit.q * Q
+  }
+  tone(bass[0], Q * 1.7, "sine", 0.022, 0)
+  tone(bass[0] * 1.5, Q * 0.85, "sine", 0.012, Q)
+  tone(bass[1], Q * 1.7, "sine", 0.022, Q * 4)
+  tone(bass[1] * 1.5, Q * 0.85, "sine", 0.012, Q * 5)
+  return t
 }
 
 export function startAmbient() {
@@ -155,8 +298,7 @@ export function startAmbient() {
   const c = getCtx()
 
   const pads: { osc: OscillatorNode; g: GainNode }[] = []
-  const padNotes = [ambPick(PADS), ambPick(PADS)]
-  padNotes.forEach((f, i) => {
+  SONGS[0]!.pad.forEach((f, i) => {
     const osc = c.createOscillator()
     const g = c.createGain()
     osc.type = "sine"
@@ -167,8 +309,8 @@ export function startAmbient() {
     osc.start()
     const lfo = c.createOscillator()
     const lg = c.createGain()
-    lfo.frequency.value = 0.09 + i * 0.05 + Math.random() * 0.04
-    lg.gain.value = 0.0025
+    lfo.frequency.value = 0.08 + i * 0.04
+    lg.gain.value = 0.0022
     lfo.connect(lg)
     lg.connect(g.gain)
     lfo.start()
@@ -176,53 +318,38 @@ export function startAmbient() {
   })
   ambNodes = pads
 
-  const driftPad = () => {
-    if (!ambRunning || !enabled) return
-    pads[0]?.osc.frequency.setValueAtTime(ambPick(PADS), c.currentTime)
-    if (pads[2]) pads[2].osc.frequency.setValueAtTime(ambPick(PADS), c.currentTime)
-    ambTimers.push(window.setTimeout(driftPad, 7000 + Math.random() * 6000))
+  const setPad = (root: number, fifth: number) => {
+    const now = c.currentTime
+    pads[0]?.osc.frequency.cancelScheduledValues(now)
+    pads[2]?.osc.frequency.cancelScheduledValues(now)
+    pads[0]?.osc.frequency.setValueAtTime(pads[0].osc.frequency.value, now)
+    pads[2]?.osc.frequency.setValueAtTime(pads[2].osc.frequency.value, now)
+    pads[0]?.osc.frequency.linearRampToValueAtTime(root, now + 0.45)
+    pads[2]?.osc.frequency.linearRampToValueAtTime(fifth, now + 0.45)
   }
-  ambTimers.push(window.setTimeout(driftPad, 8000))
 
-  let walk = 3 + Math.floor(Math.random() * 4)
+  let songIndex = 0
+  let formIndex = 0
+  setPad(...SONGS[0]!.pad)
+
   const next = () => {
     if (!ambRunning || !enabled) return
-    const roll = Math.random()
-
-    if (roll < 0.18) {
-      ambTimers.push(window.setTimeout(next, 420 + Math.random() * 1100))
-      return
+    const song = SONGS[songIndex] ?? SONGS[0]!
+    if (formIndex === 0) setPad(...song.pad)
+    const phrase = FORM[formIndex] ?? 0
+    const melody = song.phrases[phrase] ?? song.phrases[0]!
+    const bass = song.bass[phrase] ?? song.bass[0]!
+    const dur = schedulePhrase(melody, bass)
+    formIndex += 1
+    if (formIndex >= FORM.length) {
+      formIndex = 0
+      songIndex = (songIndex + 1) % SONGS.length
+      ambTimers.push(window.setTimeout(next, (dur + Q * 6) * 1000))
+    } else {
+      ambTimers.push(window.setTimeout(next, dur * 1000))
     }
-
-    if (roll < 0.34) {
-      const kind = Math.random()
-      if (kind < 0.45) {
-        tone(380 + Math.random() * 260, 0.13 + Math.random() * 0.08, "sine", 0.026, 0, 140 + Math.random() * 80)
-      } else if (kind < 0.75) {
-        const f = ambPick(SCALE)
-        tone(f * 2, 0.09, "sine", 0.02)
-        tone(f * 3, 0.11, "sine", 0.014, 0.07 + Math.random() * 0.06)
-      } else {
-        tone(200 + Math.random() * 90, 0.18, "triangle", 0.018)
-      }
-      ambTimers.push(window.setTimeout(next, 360 + Math.random() * 980))
-      return
-    }
-
-    const notes = Math.random() < 0.42 ? 1 : Math.random() < 0.78 ? 2 : 1 + Math.floor(Math.random() * 3)
-    let delay = 0
-    for (let n = 0; n < notes; n++) {
-      const jump = ambPick([-2, -1, -1, 0, 1, 1, 1, 2])
-      walk = Math.max(0, Math.min(SCALE.length - 1, walk + jump))
-      const octave = Math.random() < 0.1 ? 0.5 : Math.random() < 0.08 ? 2 : 1
-      const f = (SCALE[walk] ?? 659) * octave
-      const dur = 0.1 + Math.random() * 0.22
-      tone(f, dur, Math.random() < 0.3 ? "sine" : "triangle", 0.028 + Math.random() * 0.022, delay)
-      delay += 0.08 + Math.random() * 0.2
-    }
-    ambTimers.push(window.setTimeout(next, delay * 1000 + 180 + Math.random() * 820))
   }
-  ambTimers.push(window.setTimeout(next, 160 + Math.random() * 400))
+  ambTimers.push(window.setTimeout(next, 280))
 }
 
 export function stopAmbient() {
