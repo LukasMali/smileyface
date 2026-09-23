@@ -32,13 +32,13 @@ type Finger = {
   curve: number
 }
 
-/** knuckle origin; 0 is the thumb. lengths follow a real hand: middle > ring ≈ index > pinky */
+/** knuckle origin; 0 is the thumb, sitting on the side of the palm rather than as a sixth finger */
 const FINGERS: Finger[] = [
-  { i: 0, x: 116, y: 262, len: 96, w0: 40, w1: 29, rot: -42, nailW: 24, curve: -5 },
-  { i: 1, x: 150, y: 204, len: 116, w0: 34, w1: 24, rot: -5, nailW: 22, curve: -2 },
-  { i: 2, x: 180, y: 198, len: 128, w0: 36, w1: 25, rot: 1, nailW: 24, curve: 0 },
-  { i: 3, x: 210, y: 204, len: 118, w0: 34, w1: 24, rot: 6, nailW: 22, curve: 3 },
-  { i: 4, x: 236, y: 214, len: 92, w0: 28, w1: 19, rot: 14, nailW: 17, curve: 5 },
+  { i: 0, x: 126, y: 250, len: 100, w0: 30, w1: 24, rot: -34, nailW: 21, curve: -2 },
+  { i: 1, x: 154, y: 198, len: 118, w0: 38, w1: 24, rot: -3, nailW: 22, curve: -1 },
+  { i: 2, x: 184, y: 192, len: 130, w0: 40, w1: 25, rot: 1, nailW: 24, curve: 0 },
+  { i: 3, x: 214, y: 198, len: 120, w0: 38, w1: 24, rot: 5, nailW: 22, curve: 2 },
+  { i: 4, x: 240, y: 210, len: 94, w0: 32, w1: 19, rot: 12, nailW: 17, curve: 3 },
 ]
 
 /** how far the nail bed sits back from the fingertip */
@@ -65,17 +65,30 @@ function fingerPath(len: number, w0: number, w1: number, curve: number) {
   ].join(" ")
 }
 
-/** thumb plus the web of skin that grows out of the palm so it is not a glued-on capsule */
+function palmPath() {
+  return [
+    "M 142 194",
+    "C 134 182 158 174 182 172",
+    "C 208 170 234 176 254 190",
+    "C 270 202 278 222 276 246",
+    "C 274 272 262 300 236 314",
+    "C 216 324 176 326 156 314",
+    "C 134 300 114 276 110 250",
+    "C 108 226 120 202 142 194",
+    "Z",
+  ].join(" ")
+}
+
+/** two-segment thumb that flares into the thenar instead of sitting on as a stick */
 function thumbPath(len: number, w0: number, w1: number) {
-  const b = w0 / 2
   const t = w1 / 2
   const n = (v: number) => v.toFixed(1)
   return [
-    `M ${n(-b)} 30`,
-    `C ${n(-b - 1)} ${n(-len * 0.18)} ${n(-t - 1)} ${n(-len * 0.58)} ${n(-t)} ${n(-len + t * 0.95)}`,
-    `A ${n(t)} ${n(t)} 0 0 1 ${n(t)} ${n(-len + t * 0.9)}`,
-    `C ${n(t + 4)} ${n(-len * 0.5)} ${n(b + 8)} ${n(-len * 0.06)} ${n(b + 14)} 18`,
-    `C ${n(b + 6)} 34 ${n(0)} 40 ${n(-b + 6)} 32`,
+    `M ${n(-w0 * 0.55)} 36`,
+    `C ${n(-w0 * 0.58)} ${n(-len * 0.12)} ${n(-t - 1)} ${n(-len * 0.52)} ${n(-t)} ${n(-len + t)}`,
+    `A ${n(t)} ${n(t * 0.95)} 0 0 1 ${n(t)} ${n(-len + t * 0.9)}`,
+    `C ${n(t + 2)} ${n(-len * 0.55)} ${n(w0 * 0.35)} ${n(-len * 0.2)} ${n(w0 * 0.95)} 12`,
+    `C ${n(w0 * 0.45)} 34 ${n(4)} 42 ${n(-w0 * 0.2)} 38`,
     "Z",
   ].join(" ")
 }
@@ -381,27 +394,14 @@ function HandArt({
               <path d={fingerPath(f.len, f.w0, f.w1, f.curve)} fill={skin} />
             </g>
           ))}
+        <path d={palmPath()} fill={skin} />
         <path
-          d="M140 208
-             C132 196 154 188 176 186
-             C198 184 222 190 240 202
-             C256 214 264 232 262 254
-             C260 280 248 306 224 320
-             C204 332 166 334 148 322
-             C128 308 108 280 106 252
-             C104 230 112 214 128 206
-             C134 206 138 208 140 208Z"
+          d="M136 208
+             C122 224 114 240 118 256
+             C136 248 154 226 160 204
+             C150 198 142 202 136 208Z"
           fill={skin}
         />
-        {/* soft commissure between thumb and index — rounded, not a spike */}
-        <path
-          d="M134 216
-             C120 230 112 246 114 262
-             C128 258 144 244 154 224
-             C148 216 140 212 134 216Z"
-          fill={skin}
-        />
-        <ellipse cx="114" cy="270" rx="20" ry="22" fill={skin} />
         <g transform={`translate(${FINGERS[0]!.x} ${FINGERS[0]!.y}) rotate(${FINGERS[0]!.rot})`}>
           <path d={thumbPath(FINGERS[0]!.len, FINGERS[0]!.w0, FINGERS[0]!.w1)} fill={skin} />
         </g>
