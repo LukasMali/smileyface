@@ -8,7 +8,7 @@ import { useGame } from "../hooks/GameContext"
 type TipId = "stars" | "coins" | "happy"
 
 export function HUD({ onOpenSettings }: { onOpenSettings: () => void }) {
-  const { save, happiness, play } = useGame()
+  const { save, happiness, play, notify } = useGame()
   const loc = useLocation()
   const nav = useNavigate()
   const atRoom = loc.pathname === "/room" || loc.pathname === "/"
@@ -37,7 +37,18 @@ export function HUD({ onOpenSettings }: { onOpenSettings: () => void }) {
             <span className="max-[459px]:hidden">room</span>
           </button>
         )}
-        <Link to="/world" aria-label="map" className="hud-round no-underline" onClick={() => play("click")}>
+        <Link
+          to="/world"
+          aria-label="map"
+          className="hud-round no-underline"
+          onClick={(e) => {
+            play("click")
+            if (!save.bootDone) {
+              e.preventDefault()
+              notify("power the PC first. the map is still dreaming.")
+            }
+          }}
+        >
           <MapIcon />
           <span className="max-[459px]:hidden">map</span>
         </Link>
@@ -251,7 +262,7 @@ function HudTip({
 
 export function BottomNav() {
   const loc = useLocation()
-  const { play } = useGame()
+  const { play, save, notify } = useGame()
   const hidden = useHideOnScroll()
   const items = [
     { to: "/room", label: "room", icon: <HomeIcon /> },
@@ -272,7 +283,13 @@ export function BottomNav() {
           <Link
             key={it.to}
             to={it.to}
-            onClick={() => play("click")}
+            onClick={(e) => {
+              play("click")
+              if (!save.bootDone && it.to !== "/room") {
+                e.preventDefault()
+                notify("power the PC first. everything else is still stretching.")
+              }
+            }}
             aria-current={active ? "page" : undefined}
             className={`hit-area relative flex min-w-[3.8rem] flex-1 flex-col items-center gap-0.5 rounded-full px-2 py-1.5 font-hand text-[0.78rem] no-underline transition-colors ${
               active ? "text-ink" : "text-ink-soft"

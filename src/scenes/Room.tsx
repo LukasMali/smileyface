@@ -62,20 +62,30 @@ export function Room() {
       play("click")
       return
     }
+    if (boot) return
     setBoot(true)
     play("chime")
     window.setTimeout(() => {
-      patch((s) => ({ ...s, bootDone: true, pcStarted: true }))
+      patch((s) => ({ ...s, bootDone: true, pcStarted: true, headphonesOn: true }))
       setBoot(false)
       notify("hello :)")
     }, 1500)
+  }
+
+  const go = (path: string) => {
+    if (!save.bootDone) {
+      play("click")
+      notify("power the PC first. everything else is still stretching.")
+      return
+    }
+    nav(path)
   }
 
   return (
     <PageShell
       title="the coziest little desk"
       area="room"
-      subtitle="tap the monitors, the tower, the chair, the suspicious little objects"
+      subtitle={save.bootDone ? "tap the monitors, the tower, the chair, the suspicious little objects" : "power the PC first. then the tiny world actually exists"}
       tint={night ? "linear-gradient(180deg,#24204a 0%,#191634 100%)" : "linear-gradient(180deg,#fff3ea 0%,#ffe9e0 60%,#f7e0ec 100%)"}
       night={night}
       aside={<Pill className={night ? "bg-night text-cream" : "bg-butter"}>{night ? "night mode" : "day mode"}</Pill>}
@@ -218,10 +228,10 @@ export function Room() {
         </div>
 
         {/* monitors resting on the desk */}
-        <Hotspot x="9%" b="42%" w="24%" label="left monitor, world map" testid="monitor-map" onClick={() => nav("/world")}>
+        <Hotspot x="9%" b="42%" w="24%" label="left monitor, world map" testid="monitor-map" onClick={() => go("/world")}>
           <Monitor slant caption="WORLD" night={night} on={save.bootDone} kind="map" />
         </Hotspot>
-        <Hotspot x="35%" b="41%" w="28%" label="right monitor, digital art" testid="monitor-art" onClick={() => nav("/art")}>
+        <Hotspot x="35%" b="41%" w="28%" label="right monitor, digital art" testid="monitor-art" onClick={() => go("/art")}>
           <Monitor caption="ART" night={night} on={save.bootDone} kind="art" art={art} />
         </Hotspot>
 
@@ -248,6 +258,11 @@ export function Room() {
           label="headphones, toggle ambience"
           testid="headphones"
           onClick={() => {
+            if (!save.bootDone) {
+              play("click")
+              notify("power the PC first. the soundtrack lives in there.")
+              return
+            }
             patch((s) => ({ ...s, headphonesOn: !s.headphonesOn }))
             notify(save.headphonesOn ? "quiet mode" : "soft ambience on")
           }}
@@ -381,7 +396,7 @@ export function Room() {
             <div className="soft-card flex items-center gap-3 bg-white/94 px-3 py-2 text-left">
               <div>
                 <p className="font-hand text-base leading-tight">I made you a tiny world</p>
-                <p className="font-hand text-[0.68rem] text-ink-soft">tap everything, especially odd corners</p>
+                <p className="font-hand text-[0.68rem] text-ink-soft">power the PC. then you can go everywhere</p>
               </div>
               <GameButton tone="pink" size="sm" testid="power-start" onClick={startPc}>
                 power on
@@ -392,10 +407,10 @@ export function Room() {
       </div>
 
       <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <GameButton tone="pink" testid="open-map" onClick={() => nav("/world")}>
+        <GameButton tone="pink" testid="open-map" onClick={() => go("/world")}>
           world map
         </GameButton>
-        <GameButton tone="sun" onClick={() => nav("/achievements")}>
+        <GameButton tone="sun" onClick={() => go("/achievements")}>
           trophies
         </GameButton>
         <GameButton tone="mint" onClick={() => notify(sweetNote())}>
@@ -404,6 +419,11 @@ export function Room() {
         <GameButton
           tone="lilac"
           onClick={() => {
+            if (!save.bootDone) {
+              play("click")
+              notify("power the PC first. Nini is not taking visitors until then.")
+              return
+            }
             if (!save.completedLevels.includes("nini") && save.niniComfy) completeLevel("nini")
             nav("/nini")
           }}

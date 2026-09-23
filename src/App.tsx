@@ -66,6 +66,7 @@ function Shell() {
       <div className="grain" aria-hidden />
       <HUD onOpenSettings={() => setSettings(true)} />
       <main id="main">
+        <BootRedirect />
         <AnimatePresence mode="wait">
           <Suspense fallback={<Loader />} key={loc.pathname}>
             <Routes location={loc}>
@@ -106,6 +107,15 @@ function Shell() {
     </div>
     </MotionConfig>
   )
+}
+
+function BootRedirect() {
+  const { save } = useGame()
+  const loc = useLocation()
+  if (!save.bootDone && loc.pathname !== "/room" && loc.pathname !== "/") {
+    return <Navigate to="/room" replace />
+  }
+  return null
 }
 
 function Guard({ id, children }: { id: AreaId; children: ReactNode }) {

@@ -83,10 +83,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, [save.settings.sound])
 
   useEffect(() => {
-    if (save.headphonesOn && save.settings.sound) startAmbient()
+    if (save.bootDone && save.headphonesOn && save.settings.sound) startAmbient()
     else stopAmbient()
     return () => stopAmbient()
-  }, [save.headphonesOn, save.settings.sound])
+  }, [save.headphonesOn, save.settings.sound, save.bootDone])
 
   useEffect(() => {
     if (skipFirstPersist.current) {

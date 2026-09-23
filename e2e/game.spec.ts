@@ -100,6 +100,7 @@ test("world map opens and each level opens", async ({ page }) => {
 })
 
 test("save system works and refresh preserves progress", async ({ page }) => {
+  await seed(page)
   await page.goto("/alien-bank")
   const before = await page.getByTestId("savings-amount").innerText()
   await page.getByTestId("savings-jar").click()
@@ -158,6 +159,7 @@ test("Santa reward unlock persists", async ({ page }) => {
 
 test("mobile navigation works", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
+  await seed(page)
   await page.goto("/room")
   await page.getByRole("link", { name: "map" }).first().click()
   await expect(page).toHaveURL(/\/world/)
