@@ -1,14 +1,24 @@
-import { useEffect, useState, type ReactNode } from "react"
-import { motion } from "framer-motion"
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from "react"
+import { createPortal } from "react-dom"
+import { AnimatePresence, motion } from "framer-motion"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import { pick } from "../lib/random"
 import { useGame } from "../hooks/GameContext"
 
+type TipId = "stars" | "coins" | "happy"
+
 export function HUD({ onOpenSettings }: { onOpenSettings: () => void }) {
-  const { save, happiness, play, notify } = useGame()
+  const { save, happiness, play } = useGame()
   const loc = useLocation()
   const nav = useNavigate()
   const atRoom = loc.pathname === "/room" || loc.pathname === "/"
+  const [tip, setTip] = useState<{ id: TipId; text: string } | null>(null)
+
+  useEffect(() => {
+    if (!tip) return
+    const t = window.setTimeout(() => setTip(null), 4500)
+    return () => window.clearTimeout(t)
+  }, [tip])
 
   return (
     <header className="hud-bar">
@@ -38,9 +48,11 @@ export function HUD({ onOpenSettings }: { onOpenSettings: () => void }) {
           testid="stars"
           label={`${save.stars} stars`}
           tone="bg-butter"
+          open={tip?.id === "stars"}
+          tip={tip?.id === "stars" ? tip.text : null}
           onClick={() => {
             play("sparkle")
-            notify(pick(STAR_LINES))
+            setTip({ id: "stars", text: pick(STAR_LINES) })
           }}
         >
           <StarIcon /> {save.stars}
@@ -49,18 +61,22 @@ export function HUD({ onOpenSettings }: { onOpenSettings: () => void }) {
           testid="coins"
           label={`${save.coins} coins`}
           tone="bg-mint"
+          open={tip?.id === "coins"}
+          tip={tip?.id === "coins" ? tip.text : null}
           onClick={() => {
             play("coin")
-            notify(pick(COIN_LINES))
+            setTip({ id: "coins", text: pick(COIN_LINES) })
           }}
         >
           <CoinIcon /> {save.coins}
         </Chip>
         <HappinessChip
           value={happiness}
+          open={tip?.id === "happy"}
+          tip={tip?.id === "happy" ? tip.text : null}
           onClick={() => {
             play("chime")
-            notify(pick(HAPPY_LINES))
+            setTip({ id: "happy", text: pick(HAPPY_LINES) })
           }}
         />
         <button
@@ -106,59 +122,130 @@ function Chip({
   testid,
   label,
   tone,
+  open,
+  tip,
   onClick,
 }: {
   children: ReactNode
   testid: string
   label: string
   tone: string
+  open: boolean
+  tip: string | null
   onClick: () => void
 }) {
+  const ref = useRef<HTMLButtonElement>(null)
   return (
-    <button
-      type="button"
-      data-testid={testid}
-      aria-label={label}
-      className={`pill ${tone} cursor-pointer px-2 text-[0.82rem]`}
-      onClick={onClick}
-    >
-      {children}
-    </button>
+    <span className="relative inline-flex" data-hud-tip>
+      <button
+        ref={ref}
+        type="button"
+        data-testid={testid}
+        aria-label={label}
+        aria-expanded={open}
+        className={`pill ${tone} cursor-pointer px-2 text-[0.82rem]`}
+        onClick={onClick}
+      >
+        {children}
+      </button>
+      <HudTip open={open} text={tip} anchor={ref} />
+    </span>
   )
 }
 
-function HappinessChip({ value, onClick }: { value: number; onClick: () => void }) {
+function HappinessChip({
+  value,
+  open,
+  tip,
+  onClick,
+}: {
+  value: number
+  open: boolean
+  tip: string | null
+  onClick: () => void
+}) {
+  const ref = useRef<HTMLButtonElement>(null)
   const r = 9
   const c = 2 * Math.PI * r
   return (
-    <button
-      type="button"
-      data-testid="happiness"
-      aria-label={`happiness ${value} percent`}
-      className="pill cursor-pointer bg-blush gap-1.5 px-2 text-[0.82rem]"
-      onClick={onClick}
-    >
-      <span className="relative inline-flex h-[22px] w-[22px] items-center justify-center">
-        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden>
-          <circle cx="12" cy="12" r={r} fill="none" stroke="#fff" strokeWidth="4" />
-          <motion.circle
-            cx="12"
-            cy="12"
-            r={r}
-            fill="none"
-            stroke="#ef6b92"
-            strokeWidth="4"
-            strokeLinecap="round"
-            transform="rotate(-90 12 12)"
-            strokeDasharray={c}
-            initial={false}
-            animate={{ strokeDashoffset: c * (1 - Math.max(0, Math.min(100, value)) / 100) }}
-            transition={{ type: "spring", stiffness: 120, damping: 20 }}
-          />
-        </svg>
-      </span>
-      <span className="max-[359px]:hidden">{value}%</span>
-    </button>
+    <span className="relative inline-flex" data-hud-tip>
+      <button
+        ref={ref}
+        type="button"
+        data-testid="happiness"
+        aria-label={`happiness ${value} percent`}
+        aria-expanded={open}
+        className="pill cursor-pointer bg-blush gap-1.5 px-2 text-[0.82rem]"
+        onClick={onClick}
+      >
+        <span className="relative inline-flex h-[22px] w-[22px] items-center justify-center">
+          <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden>
+            <circle cx="12" cy="12" r={r} fill="none" stroke="#fff" strokeWidth="4" />
+            <motion.circle
+              cx="12"
+              cy="12"
+              r={r}
+              fill="none"
+              stroke="#ef6b92"
+              strokeWidth="4"
+              strokeLinecap="round"
+              transform="rotate(-90 12 12)"
+              strokeDasharray={c}
+              initial={false}
+              animate={{ strokeDashoffset: c * (1 - Math.max(0, Math.min(100, value)) / 100) }}
+              transition={{ type: "spring", stiffness: 120, damping: 20 }}
+            />
+          </svg>
+        </span>
+        <span className="max-[359px]:hidden">{value}%</span>
+      </button>
+      <HudTip open={open} text={tip} anchor={ref} />
+    </span>
+  )
+}
+
+function HudTip({
+  open,
+  text,
+  anchor,
+}: {
+  open: boolean
+  text: string | null
+  anchor: RefObject<HTMLElement | null>
+}) {
+  const [pos, setPos] = useState({ top: 52, left: 0 })
+
+  useLayoutEffect(() => {
+    if (!open) return
+    const el = anchor.current
+    if (!el) return
+    const r = el.getBoundingClientRect()
+    let left = r.left
+    const room = Math.min(220, window.innerWidth - 16)
+    if (left + room > window.innerWidth - 8) left = Math.max(8, window.innerWidth - 8 - room)
+    if (left < 8) left = 8
+    setPos({ top: r.bottom + 8, left })
+  }, [open, text, anchor])
+
+  if (typeof document === "undefined") return null
+
+  return createPortal(
+    <AnimatePresence>
+      {open && text && (
+        <motion.p
+          role="status"
+          data-testid="hud-tip"
+          initial={{ opacity: 1, y: 0, scale: 1 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0 }}
+          style={{ position: "fixed", top: pos.top, left: pos.left, zIndex: 200 }}
+          className="m-0 w-max max-w-[min(13.5rem,calc(100vw-1.4rem))] rounded-2xl border-[1.5px] border-ink/10 bg-white px-2.5 py-1.5 text-left font-hand text-[0.72rem] leading-snug text-ink shadow-[0_12px_22px_-14px_rgba(91,68,80,0.95)] sm:text-sm"
+        >
+          {text}
+        </motion.p>
+      )}
+    </AnimatePresence>,
+    document.body,
   )
 }
 

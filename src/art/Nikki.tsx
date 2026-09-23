@@ -117,7 +117,7 @@ export function Nikki({
         </radialGradient>
       </defs>
       {sleeping ? (
-        <SleepingNikki id={id} harness={harness} animated={animated} />
+        <SleepingNikki id={id} animated={animated} />
       ) : (
         <AwakeNikki id={id} pose={pose} harness={harness} animated={animated} />
       )}
@@ -292,17 +292,16 @@ function AwakeNikki({
   )
 }
 
-function SleepingNikki({ id, harness, animated }: { id: string; harness: boolean; animated: boolean }) {
+function SleepingNikki({ id, animated }: { id: string; animated: boolean }) {
   const coat = `url(#${id}-coat)`
   const cream = `url(#${id}-cream)`
   return (
     <g>
       <ellipse cx="148" cy="154" rx="88" ry="10" fill="#5b4450" opacity="0.14" />
       <g className={animated ? "anim-breathe" : undefined} style={{ transformOrigin: "140px 118px" }}>
-        {/* curled loaf body */}
+        {/* curled loaf body — no harness; napping is a uniform-free activity */}
         <FurBlob cx={152} cy={112} rx={66} ry={34} lobes={16} bulge={0.09} seed={4} fill={coat} />
         <path d="M108 88c24-14 62-16 90-4" stroke={COAT_LIGHT} strokeWidth="3.4" fill="none" opacity="0.45" strokeLinecap="round" />
-        {harness && <path d="M128 92c24 10 52 10 74 0" stroke={`url(#${id}-harness)`} strokeWidth="8" fill="none" strokeLinecap="round" />}
 
         {/* tucked tail */}
         <FurBlob cx={214} cy={124} rx={18} ry={13} lobes={9} bulge={0.14} seed={9} fill={coat} />

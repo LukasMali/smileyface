@@ -102,9 +102,18 @@ input[type="range"] {
   min-height: var(--hud-h);
   padding: 0.4rem 0.7rem calc(0.4rem);
   padding-top: calc(0.4rem + env(safe-area-inset-top));
+  overflow: visible;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 8%, transparent);
+}
+
+.hud-bar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
   background: color-mix(in srgb, var(--color-cream) 86%, transparent);
   backdrop-filter: blur(14px) saturate(1.1);
-  border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 8%, transparent);
 }
 
 @media (max-width: 389px) {

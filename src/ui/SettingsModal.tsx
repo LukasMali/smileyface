@@ -41,26 +41,7 @@ export function SettingsModal({ open, onClose }: { open: boolean; onClose: () =>
 
             {!credits ? (
               <div className="flex flex-col gap-2">
-                <GameButton
-                  tone="mint"
-                  block
-                  testid="continue-btn"
-                  onClick={() => {
-                    play("click")
-                    onClose()
-                    nav(
-                      save.lastVisitedArea === "world"
-                        ? "/world"
-                        : save.lastVisitedArea === "room"
-                          ? "/room"
-                          : `/${save.lastVisitedArea}`,
-                    )
-                  }}
-                >
-                  continue where I was
-                </GameButton>
-
-                <SectionTitle className="mt-2 mb-0">comfort</SectionTitle>
+                <SectionTitle className="mb-0">comfort</SectionTitle>
                 <Toggle
                   label="sound"
                   hint="tiny clicks, coins and one bark"

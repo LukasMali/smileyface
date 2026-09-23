@@ -73,7 +73,7 @@ export function Room() {
 
   return (
     <PageShell
-      title="her little setup"
+      title="the coziest little desk"
       area="room"
       subtitle="tap the monitors, the tower, the chair, the suspicious little objects"
       tint={night ? "linear-gradient(180deg,#24204a 0%,#191634 100%)" : "linear-gradient(180deg,#fff3ea 0%,#ffe9e0 60%,#f7e0ec 100%)"}
