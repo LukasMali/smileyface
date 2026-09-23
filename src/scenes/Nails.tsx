@@ -32,65 +32,70 @@ type Finger = {
   curve: number
 }
 
-/** knuckle origin; 0 is the thumb, sitting on the side of the palm rather than as a sixth finger */
+/** knuckle origin; 0 is the thumb. slim proportions — a real hand is longer than it is wide */
 const FINGERS: Finger[] = [
-  { i: 0, x: 126, y: 250, len: 100, w0: 30, w1: 24, rot: -34, nailW: 21, curve: -2 },
-  { i: 1, x: 154, y: 198, len: 118, w0: 38, w1: 24, rot: -3, nailW: 22, curve: -1 },
-  { i: 2, x: 184, y: 192, len: 130, w0: 40, w1: 25, rot: 1, nailW: 24, curve: 0 },
-  { i: 3, x: 214, y: 198, len: 120, w0: 38, w1: 24, rot: 5, nailW: 22, curve: 2 },
-  { i: 4, x: 240, y: 210, len: 94, w0: 32, w1: 19, rot: 12, nailW: 17, curve: 3 },
+  { i: 0, x: 134, y: 246, len: 90, w0: 22, w1: 16, rot: -40, nailW: 15, curve: -1 },
+  { i: 1, x: 154, y: 196, len: 124, w0: 20, w1: 15, rot: -7, nailW: 15, curve: -1 },
+  { i: 2, x: 176, y: 190, len: 138, w0: 22, w1: 16, rot: 0, nailW: 16, curve: 0 },
+  { i: 3, x: 198, y: 196, len: 126, w0: 20, w1: 15, rot: 7, nailW: 15, curve: 1 },
+  { i: 4, x: 218, y: 208, len: 98, w0: 16, w1: 12, rot: 16, nailW: 12, curve: 2 },
 ]
 
 /** how far the nail bed sits back from the fingertip */
-const NAIL_PAD = 17
+const NAIL_PAD = 14
 
-function fingerPath(len: number, w0: number, w1: number, curve: number) {
-  const b = w0 / 2
-  const t = w1 / 2
-  const pip = w0 * 0.46
-  const dip = w0 * 0.28 + w1 * 0.22
-  const c = curve
-  const yPip = -len * 0.4
-  const yDip = -len * 0.69
-  const yTip = -len
-  const n = (v: number) => v.toFixed(1)
-  return [
-    `M ${n(-b)} 22`,
-    `C ${n(-b)} ${n(-len * 0.12)} ${n(-pip + c * 0.2)} ${n(yPip + 10)} ${n(-pip + c * 0.28)} ${n(yPip)}`,
-    `C ${n(-dip + c * 0.5)} ${n(yDip + 8)} ${n(-t + c * 0.82)} ${n(yTip + t + 10)} ${n(-t + c)} ${n(yTip + t * 0.88)}`,
-    `A ${n(t)} ${n(t * 0.96)} 0 0 1 ${n(t + c)} ${n(yTip + t * 0.88)}`,
-    `C ${n(t + c * 0.82)} ${n(yTip + t + 10)} ${n(dip + c * 0.5)} ${n(yDip + 8)} ${n(pip + c * 0.28)} ${n(yPip)}`,
-    `C ${n(pip + c * 0.2)} ${n(yPip + 10)} ${n(b)} ${n(-len * 0.12)} ${n(b)} 22`,
-    "Z",
-  ].join(" ")
+function n(v: number) {
+  return v.toFixed(1)
 }
 
-function palmPath() {
-  return [
-    "M 142 194",
-    "C 134 182 158 174 182 172",
-    "C 208 170 234 176 254 190",
-    "C 270 202 278 222 276 246",
-    "C 274 272 262 300 236 314",
-    "C 216 324 176 326 156 314",
-    "C 134 300 114 276 110 250",
-    "C 108 226 120 202 142 194",
-    "Z",
-  ].join(" ")
+function fingerPoint(f: Finger, lx: number, ly: number): [number, number] {
+  const r = (f.rot * Math.PI) / 180
+  const c = Math.cos(r)
+  const s = Math.sin(r)
+  return [f.x + lx * c - ly * s, f.y + lx * s + ly * c]
 }
 
-/** two-segment thumb that flares into the thenar instead of sitting on as a stick */
-function thumbPath(len: number, w0: number, w1: number) {
-  const t = w1 / 2
-  const n = (v: number) => v.toFixed(1)
-  return [
-    `M ${n(-w0 * 0.55)} 36`,
-    `C ${n(-w0 * 0.58)} ${n(-len * 0.12)} ${n(-t - 1)} ${n(-len * 0.52)} ${n(-t)} ${n(-len + t)}`,
-    `A ${n(t)} ${n(t * 0.95)} 0 0 1 ${n(t)} ${n(-len + t * 0.9)}`,
-    `C ${n(t + 2)} ${n(-len * 0.55)} ${n(w0 * 0.35)} ${n(-len * 0.2)} ${n(w0 * 0.95)} 12`,
-    `C ${n(w0 * 0.45)} 34 ${n(4)} 42 ${n(-w0 * 0.2)} 38`,
-    "Z",
-  ].join(" ")
+function fingerEdge(f: Finger, left: boolean): [number, number][] {
+  const sign = left ? -1 : 1
+  const half = (t: number) => ((f.w0 * (1 - t) + f.w1 * t) / 2) * sign
+  const y = (t: number) => 10 * (1 - t) + (-f.len + f.w1 * 0.4) * t
+  return [0.06, 0.36, 0.68, 1].map((t) => fingerPoint(f, half(t) + f.curve * t * 0.5, y(t)))
+}
+
+function digitLobe(f: Finger): [number, number][] {
+  const L = fingerEdge(f, true)
+  const R = fingerEdge(f, false)
+  const tip = fingerPoint(f, f.curve * 0.4, -f.len)
+  return [...L, tip, ...R.reverse()]
+}
+
+function catmullClosed(pts: [number, number][]) {
+  const ext: [number, number][] = [pts[pts.length - 1]!, ...pts, pts[0]!, pts[1]!]
+  let d = `M ${n(pts[0]![0])} ${n(pts[0]![1])}`
+  for (let i = 0; i < pts.length; i++) {
+    const p0 = ext[i]!
+    const p1 = ext[i + 1]!
+    const p2 = ext[i + 2]!
+    const p3 = ext[i + 3]!
+    d += ` C ${n(p1[0] + (p2[0] - p0[0]) / 7)} ${n(p1[1] + (p2[1] - p0[1]) / 7)} ${n(p2[0] - (p3[0] - p1[0]) / 7)} ${n(p2[1] - (p3[1] - p1[1]) / 7)} ${n(p2[0])} ${n(p2[1])}`
+  }
+  return `${d} Z`
+}
+
+/** one outline: slender fingers, trapezoid palm, thumb as a side digit */
+function handSilhouette(fs: Finger[]) {
+  const thumb = fs[0]!
+  const pts: [number, number][] = [
+    [170, 318],
+    [160, 298],
+    [152, 276],
+    [148, 256],
+    ...digitLobe(thumb),
+    [148, 216],
+  ]
+  for (const f of fs.slice(1)) pts.push(...digitLobe(f))
+  pts.push([226, 232], [222, 258], [214, 286], [204, 310], [190, 320], [176, 316])
+  return catmullClosed(pts)
 }
 
 const DEFAULT_DESIGN: NailDesign = {
@@ -354,13 +359,13 @@ function HandArt({
   const skin = `url(#${id}-skin)`
 
   return (
-    <svg viewBox="0 0 320 348" className="mx-auto block w-full max-w-sm select-none" role="img" aria-label="hand with five nails">
+    <svg viewBox="0 0 320 350" className="mx-auto block w-full max-w-sm select-none" role="img" aria-label="hand with five nails">
       <defs>
-        <radialGradient id={`${id}-skin`} cx="0.38" cy="0.3" r="0.78">
-          <stop offset="0%" stopColor="#ffe9da" />
-          <stop offset="52%" stopColor="#f6d0b8" />
-          <stop offset="100%" stopColor="#e2b395" />
-        </radialGradient>
+        <linearGradient id={`${id}-skin`} x1="0.28" y1="0.08" x2="0.78" y2="1">
+          <stop offset="0%" stopColor="#ffe6d4" />
+          <stop offset="55%" stopColor="#f0c8b0" />
+          <stop offset="100%" stopColor="#e0b094" />
+        </linearGradient>
         <linearGradient id={`${id}-polish`} x1="0" y1="1" x2="0" y2="0">
           <stop offset="0%" stopColor={design.baseColor} />
           <stop offset={design.gradient ? "55%" : "100%"} stopColor={design.baseColor} />
@@ -372,45 +377,24 @@ function HandArt({
           <stop offset="60%" stopColor="#d9c7ff" stopOpacity="0.55" />
           <stop offset="100%" stopColor="#ffffff" stopOpacity="0.2" />
         </linearGradient>
-        <filter id={`${id}-outline`} x="-24" y="-24" width="368" height="396" filterUnits="userSpaceOnUse">
-          <feMorphology in="SourceAlpha" operator="dilate" radius="2.05" result="dil" />
-          <feFlood floodColor="#d4a38a" result="col" />
-          <feComposite in="col" in2="dil" operator="in" result="line" />
-          <feMerge>
-            <feMergeNode in="line" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
       </defs>
 
-      <ellipse cx="176" cy="332" rx="70" ry="8" fill="#5b4450" opacity="0.12" />
+      <ellipse cx="188" cy="324" rx="42" ry="5" fill="#5b4450" opacity="0.1" />
 
-      <g filter={`url(#${id}-outline)`}>
-        {FINGERS.filter((f) => f.i !== 0)
-          .slice()
-          .reverse()
-          .map((f) => (
-            <g key={f.i} transform={`translate(${f.x} ${f.y}) rotate(${f.rot})`}>
-              <path d={fingerPath(f.len, f.w0, f.w1, f.curve)} fill={skin} />
-            </g>
-          ))}
-        <path d={palmPath()} fill={skin} />
-        <path
-          d="M136 208
-             C122 224 114 240 118 256
-             C136 248 154 226 160 204
-             C150 198 142 202 136 208Z"
-          fill={skin}
-        />
-        <g transform={`translate(${FINGERS[0]!.x} ${FINGERS[0]!.y}) rotate(${FINGERS[0]!.rot})`}>
-          <path d={thumbPath(FINGERS[0]!.len, FINGERS[0]!.w0, FINGERS[0]!.w1)} fill={skin} />
-        </g>
-      </g>
-
-      <ellipse cx="160" cy="230" rx="18" ry="11" fill="#fff" opacity="0.22" />
-      {[152, 180, 208, 232].map((x, i) => (
-        <ellipse key={x} cx={x} cy={204} rx={7.5 - i * 0.35} ry={4.8} fill="#fff" opacity="0.18" />
-      ))}
+      <path
+        d={handSilhouette(FINGERS)}
+        fill={skin}
+        stroke="#d4a38a"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M168 236 C182 244 200 244 214 236"
+        stroke="#e3b59c"
+        strokeWidth="1.4"
+        fill="none"
+        opacity="0.4"
+      />
 
       {FINGERS.map((f) => renderFinger(f))}
     </svg>
@@ -449,10 +433,10 @@ function HandArt({
           />
         )}
         <path
-          d={`M${-f.w0 * 0.28} 2 C ${-f.w1 * 0.2} ${-f.len * 0.42} ${-f.w1 * 0.16} ${-f.len * 0.82} ${-f.w1 * 0.08} ${-f.len + 12}`}
+          d={`M${-f.w0 * 0.22} ${-f.len * 0.08} C ${-f.w1 * 0.16} ${-f.len * 0.42} ${-f.w1 * 0.12} ${-f.len * 0.78} ${-f.w1 * 0.06} ${-f.len + 10}`}
           stroke="#fff"
-          strokeWidth="2.8"
-          opacity="0.24"
+          strokeWidth="1.6"
+          opacity="0.22"
           fill="none"
           strokeLinecap="round"
         />
@@ -460,7 +444,7 @@ function HandArt({
           <clipPath id={`${id}-clip-${f.i}`}>
             <path d={nailPath(design.shape, nailW, nailH)} />
           </clipPath>
-          <path d={nailPath(design.shape, nailW + 3.2, nailH + 2.4)} fill="#e7b9a0" opacity="0.8" />
+          <path d={nailPath(design.shape, nailW + 2, nailH + 1.6)} fill="#e7b9a0" opacity="0.75" />
           <path
             d={nailPath(design.shape, nailW, nailH)}
             fill={`url(#${id}-polish)`}
