@@ -140,76 +140,65 @@ function AwakeNikki({
   const cream = `url(#${id}-cream)`
   const stretching = pose === "stretch"
   const wag = animated && !stretching
-  const lean = stretching ? "rotate(-42 132 168)" : pose === "spin" ? "rotate(7 100 120)" : undefined
+  const lean = stretching ? "rotate(-11 100 150)" : pose === "spin" ? "rotate(7 100 120)" : undefined
 
   return (
     <g>
-      <ellipse cx={stretching ? 108 : 100} cy="188" rx={stretching ? 70 : 58} ry="8" fill="#5b4450" opacity="0.15" />
-
-      {stretching && (
-        <g opacity="0.7" fill="none" stroke="#ff9db5" strokeWidth="2.4" strokeLinecap="round">
-          <path d="M8 154h22" />
-          <path d="M12 164h18" />
-          <path d="M10 174h16" />
-        </g>
-      )}
+      <ellipse cx="100" cy="188" rx="58" ry="8" fill="#5b4450" opacity="0.15" />
 
       {/* fluffy plume tail, sweeping up behind her */}
-      <g className={wag ? "anim-tail" : undefined} style={{ transformOrigin: stretching ? "148px 118px" : "68px 152px" }}>
+      <g className={wag ? "anim-tail" : undefined} style={{ transformOrigin: "68px 152px" }}>
         <path
-          d={
-            stretching
-              ? "M148 122c12-22 8-44-8-54-14-8-24 8-18 24 6 18 10 32 26 30z"
-              : "M68 152c-16-2-30-12-36-26-5-13 1-26 10-25 10 1 13 15 14 26 1 10 7 19 12 25z"
-          }
+          d="M68 152c-16-2-30-12-36-26-5-13 1-26 10-25 10 1 13 15 14 26 1 10 7 19 12 25z"
           fill={coat}
           stroke={LINE}
           strokeWidth={STROKE.thick}
           strokeLinejoin="round"
         />
-        {!stretching && (
-          <path d="M40 106c1 11 4 22 10 31" stroke={COAT_LIGHT} strokeWidth="2.2" fill="none" opacity="0.5" strokeLinecap="round" />
-        )}
+        <path d="M40 106c1 11 4 22 10 31" stroke={COAT_LIGHT} strokeWidth="2.2" fill="none" opacity="0.5" strokeLinecap="round" />
       </g>
 
       <g className={animated ? "anim-breathe" : undefined} transform={lean} style={{ transformOrigin: "100px 150px" }}>
         {/* body */}
         <FurBlob
-          cx={stretching ? 118 : 100}
-          cy={stretching ? 152 : 148}
-          rx={stretching ? 52 : 38}
-          ry={stretching ? 20 : 30}
+          cx={100}
+          cy={stretching ? 154 : 148}
+          rx={stretching ? 40 : 38}
+          ry={stretching ? 26 : 30}
           lobes={13}
           bulge={0.11}
           seed={3}
           fill={coat}
         />
         {/* cream chest bib */}
-        <path
-          d={
-            stretching
-              ? "M78 144c18-4 36 4 36 16 0 9-16 14-36 14s-32-5-32-14c0-12 14-20 32-16z"
-              : "M100 122c14 0 23 11 23 24 0 12-10 20-23 20s-23-8-23-20c0-13 9-24 23-24z"
-          }
-          fill={cream}
-        />
+        <path d="M100 122c14 0 23 11 23 24 0 12-10 20-23 20s-23-8-23-20c0-13 9-24 23-24z" fill={cream} />
         <path d="M84 133c8-6 24-6 32 0" stroke="#fff" strokeWidth="2" opacity="0.6" fill="none" />
 
-        {/* little cream front paws — stretch plants them way out in front */}
+        {/* little cream front paws — stretch reaches them a bit farther forward */}
         <g className={pose === "walk" && animated ? "anim-bob" : undefined}>
-          {stretching ? (
-            <>
-              <ellipse cx="38" cy="176" rx="24" ry="8" fill={cream} stroke={LINE} strokeWidth={STROKE.base} transform="rotate(-28 38 176)" />
-              <ellipse cx="70" cy="184" rx="22" ry="8" fill={cream} stroke={LINE} strokeWidth={STROKE.base} transform="rotate(6 70 184)" />
-              <path d="M22 168h16M56 182h16" stroke={CREAM_DEEP} strokeWidth={STROKE.hair} />
-            </>
-          ) : (
-            <>
-              <ellipse cx="85" cy="176" rx="12" ry="9" fill={cream} stroke={LINE} strokeWidth={STROKE.base} />
-              <ellipse cx="115" cy="176" rx="12" ry="9" fill={cream} stroke={LINE} strokeWidth={STROKE.base} />
-              <path d="M80 176h10M110 176h10" stroke={CREAM_DEEP} strokeWidth={STROKE.hair} />
-            </>
-          )}
+          <ellipse
+            cx={stretching ? 76 : 85}
+            cy={stretching ? 182 : 176}
+            rx={stretching ? 15 : 12}
+            ry={stretching ? 8 : 9}
+            fill={cream}
+            stroke={LINE}
+            strokeWidth={STROKE.base}
+          />
+          <ellipse
+            cx={stretching ? 122 : 115}
+            cy={stretching ? 182 : 176}
+            rx={stretching ? 15 : 12}
+            ry={stretching ? 8 : 9}
+            fill={cream}
+            stroke={LINE}
+            strokeWidth={STROKE.base}
+          />
+          <path
+            d={stretching ? "M70 182h12M116 182h12" : "M80 176h10M110 176h10"}
+            stroke={CREAM_DEEP}
+            strokeWidth={STROKE.hair}
+          />
         </g>
 
         {harness && (
@@ -222,7 +211,7 @@ function AwakeNikki({
         )}
 
         {/* head */}
-        <g transform={stretching ? "rotate(22 100 84) translate(-18 18)" : undefined}>
+        <g transform={stretching ? "translate(0 8)" : undefined}>
           {/* ears, fluffy and slightly back like the real dog */}
           <g className={animated ? "anim-ear" : undefined} style={{ transformOrigin: "66px 52px" }}>
             <path d="M72 58C60 42 52 22 58 16c7-6 22 6 30 26z" fill={coat} stroke={LINE} strokeWidth={STROKE.base} strokeLinejoin="round" />
@@ -266,11 +255,13 @@ function AwakeNikki({
           <path d="M100 94c5.4 0 8.6 3 8.6 6.2 0 3.4-4 5.4-8.6 5.4s-8.6-2-8.6-5.4c0-3.2 3.2-6.2 8.6-6.2z" fill="#241c26" />
           <ellipse cx="96.6" cy="97.4" rx="2.1" ry="1.3" fill="#fff" opacity="0.45" />
           <path d="M100 106.5v3.5" stroke="#241c26" strokeWidth={STROKE.fine} strokeLinecap="round" />
-          {stretching ? (
-            <path d="M90 112c4 8 16 8 20 0z" fill="#ff9db5" stroke="#241c26" strokeWidth={STROKE.fine} strokeLinejoin="round" />
-          ) : (
-            <path d="M100 110c-3 4-8 4-11 1M100 110c3 4 8 4 11 1" stroke="#241c26" strokeWidth={STROKE.fine} fill="none" strokeLinecap="round" />
-          )}
+          <path
+            d={stretching ? "M100 110c-4 5-10 5-13 1M100 110c4 5 10 5 13 1" : "M100 110c-3 4-8 4-11 1M100 110c3 4 8 4 11 1"}
+            stroke="#241c26"
+            strokeWidth={STROKE.fine}
+            fill="none"
+            strokeLinecap="round"
+          />
           <g fill="#c8a184" opacity="0.55">
             <circle cx="88" cy="103" r="1.1" />
             <circle cx="92" cy="108" r="1" />

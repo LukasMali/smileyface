@@ -17,7 +17,7 @@ import {
   Burger as BurgerArt,
   LegendaryPlate,
 } from "../art/Props"
-import { CHAIR_LINES, NIKKI_LINES } from "../game/messages"
+import { CHAIR_LINES, NIKKI_LINES, SWEET_MESSAGES } from "../game/messages"
 import { MEMORY_EGG } from "../game/memoryEgg"
 import { SHELF_ITEMS } from "../game/progress"
 import { ART_KEY } from "../game/types"
@@ -25,6 +25,7 @@ import { useGame } from "../hooks/GameContext"
 import { pick } from "../lib/random"
 import { playNote } from "../audio/sound"
 import { GameButton, Pill } from "../ui/Button"
+import { NotesBook } from "../ui/NotesBook"
 import { PageShell } from "../ui/PageShell"
 
 const RGB = ["#7cff9a", "#ff8fae", "#8fcbec", "#bfa9f0", "#ffd45e", "#ff9f6b"]
@@ -43,6 +44,7 @@ export function Room() {
   const nav = useNavigate()
   const [boot, setBoot] = useState(false)
   const [keys, setKeys] = useState(0)
+  const [notesOpen, setNotesOpen] = useState(false)
   const night = save.finaleReady
   const sparkles = Math.floor(save.happiness / 12)
   const shelf = SHELF_ITEMS.filter((i) => i.need(save))
@@ -287,7 +289,7 @@ export function Room() {
             discoverSecret("desk-mouse", "the mouse knows things")
           }}
         >
-          <span className="mb-0.5 block h-[22px] w-[15px] sm:h-[26px] sm:w-[18px]">
+          <span className="mb-0.5 block h-[24px] w-[16px] sm:h-11 sm:w-8">
             <MouseArt />
           </span>
         </Hotspot>
@@ -306,8 +308,10 @@ export function Room() {
           <Chair night={night} />
         </Hotspot>
 
-        <Hotspot x="69%" b="34%" w="7%" label="hot chocolate" onClick={() => { play("pop"); notify("hot chocolate. the correct drink.") }}>
-          <Mug />
+        <Hotspot x="70%" b="34.5%" w="5%" compact label="hot chocolate" onClick={() => { play("pop"); notify("hot chocolate. the correct drink.") }}>
+          <span className="mx-auto mb-0.5 block h-[22px] w-[22px] sm:h-8 sm:w-8">
+            <Mug />
+          </span>
         </Hotspot>
 
         <Hotspot x="42%" b="30%" w="10%" label="hidden desk drawer" onClick={() => { notify(sweetNote()); discoverSecret("desk-drawer") }}>
@@ -329,7 +333,7 @@ export function Room() {
           </Hotspot>
         )}
 
-        <div className="absolute right-[3%] bottom-[1%] z-[15] max-[459px]:right-[1%] max-[459px]:origin-bottom-right max-[459px]:scale-[0.82]">
+        <div className="absolute right-[17%] bottom-[2%] z-[15] max-[459px]:origin-bottom max-[459px]:scale-[0.9]">
           <motion.button
             type="button"
             aria-label="pet Nikki"
@@ -343,7 +347,7 @@ export function Room() {
               notify(line)
             }}
           >
-            <Nikki pose={night ? "sleep" : save.happiness > 50 ? "sit" : "stand"} size={86} />
+            <Nikki pose={night ? "sleep" : save.happiness > 50 ? "sit" : "stand"} size={90} />
           </motion.button>
         </div>
 
@@ -407,6 +411,15 @@ export function Room() {
           visit Nini
         </GameButton>
       </div>
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+        <p className={`font-hand text-sm ${night ? "text-cream/80" : "text-ink-soft"}`} data-testid="notes-count">
+          notes found {save.unlockedMessages.length}/{SWEET_MESSAGES.length}
+        </p>
+        <GameButton size="sm" tone="cream" testid="see-notes" onClick={() => setNotesOpen(true)}>
+          see found notes
+        </GameButton>
+      </div>
+      <NotesBook open={notesOpen} onClose={() => setNotesOpen(false)} notes={save.unlockedMessages} />
     </PageShell>
   )
 }

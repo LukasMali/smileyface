@@ -291,9 +291,9 @@ export function ArtStudio() {
               key={c}
               type="button"
               aria-label={`color ${c}`}
-              aria-pressed={color === c}
+              aria-pressed={color.toLowerCase() === c}
               className={`h-9 w-9 rounded-full border-[2.5px] transition-transform ${
-                color === c ? "scale-110 border-ink shadow-[0_0_0_3px_rgba(255,255,255,0.9)]" : "border-ink/12"
+                color.toLowerCase() === c ? "scale-110 border-ink shadow-[0_0_0_3px_rgba(255,255,255,0.9)]" : "border-ink/12"
               }`}
               style={{ background: c }}
               onClick={() => {
@@ -303,6 +303,40 @@ export function ArtStudio() {
               }}
             />
           ))}
+          <label
+            className={`relative h-9 w-9 shrink-0 cursor-pointer rounded-full border-[2.5px] transition-transform ${
+              COLORS.includes(color.toLowerCase())
+                ? "border-ink/12"
+                : "scale-110 border-ink shadow-[0_0_0_3px_rgba(255,255,255,0.9)]"
+            }`}
+            title="choose your own color"
+          >
+            <span
+              className="pointer-events-none absolute inset-[3px] rounded-full"
+              style={{
+                background: COLORS.includes(color.toLowerCase())
+                  ? "conic-gradient(#ff8fae, #ffd45e, #8fddb4, #8fcbec, #bfa9f0, #ff8fae)"
+                  : color,
+              }}
+            />
+            {COLORS.includes(color.toLowerCase()) && (
+              <span className="pointer-events-none absolute inset-0 flex items-center justify-center font-hand text-lg leading-none text-ink">
+                +
+              </span>
+            )}
+            <input
+              type="color"
+              data-testid="custom-color"
+              aria-label="choose your own color"
+              value={COLORS.includes(color.toLowerCase()) ? "#ff8fae" : color}
+              onChange={(e) => {
+                setColor(e.target.value)
+                if (tool === "eraser") setTool("brush")
+                play("click")
+              }}
+              className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+            />
+          </label>
         </div>
 
         <div className="mt-3 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">

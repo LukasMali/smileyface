@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
 import { AchIcon } from "../art/AchIcon"
@@ -7,10 +8,13 @@ import { isAreaOpen } from "../game/progress"
 import { useGame } from "../hooks/GameContext"
 import { PageShell } from "../ui/PageShell"
 import { CheckIcon, GameButton, LockIcon, Panel, Pill, ProgressBar, SectionTitle } from "../ui/Button"
+import { NotesBook } from "../ui/NotesBook"
 
 export function Achievements() {
   const { save, notify, sweetNote, reducedMotion } = useGame()
+  const [notesOpen, setNotesOpen] = useState(false)
   const doneCount = AREAS.filter((a) => save.completedLevels.includes(a.id)).length
+  const noteCount = save.unlockedMessages.length
 
   return (
     <PageShell
@@ -114,21 +118,30 @@ export function Achievements() {
       </div>
 
       <Panel className="mt-4 bg-white/88">
-        <SectionTitle hint={`${SWEET_MESSAGES.length} exist somewhere`}>found notes</SectionTitle>
+        <SectionTitle hint={`${noteCount}/${SWEET_MESSAGES.length} found`}>found notes</SectionTitle>
+        <p className="mb-3 font-hand text-sm text-ink-soft" data-testid="notes-count">
+          {noteCount} of {SWEET_MESSAGES.length} little notes collected
+        </p>
         <ul className="m-0 flex list-none flex-col gap-2 p-0">
-          {save.unlockedMessages.slice(-8).map((m) => (
+          {save.unlockedMessages.slice(-3).map((m) => (
             <li key={m} className="rounded-2xl border-[1.5px] border-ink/8 bg-cream px-3 py-2 font-hand text-sm">
               {m}
             </li>
           ))}
-          {save.unlockedMessages.length === 0 && (
+          {noteCount === 0 && (
             <li className="font-hand text-sm text-ink-soft">none yet · tap things, notes appear</li>
           )}
         </ul>
-        <GameButton className="mt-3" tone="pink" size="sm" onClick={() => notify(sweetNote())}>
-          another fortune cookie
-        </GameButton>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <GameButton size="sm" tone="lilac" testid="see-notes" onClick={() => setNotesOpen(true)}>
+            see all found notes
+          </GameButton>
+          <GameButton tone="pink" size="sm" onClick={() => notify(sweetNote())}>
+            another fortune cookie
+          </GameButton>
+        </div>
       </Panel>
+      <NotesBook open={notesOpen} onClose={() => setNotesOpen(false)} notes={save.unlockedMessages} />
     </PageShell>
   )
 }
