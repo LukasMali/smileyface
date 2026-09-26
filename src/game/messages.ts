@@ -13,7 +13,7 @@ export const SWEET_MESSAGES = [
   "you are the easiest person in the world to root for",
   "you deserve peaceful days, good food and excellent naps",
   "elite human detected",
-  "very funny. unfortunately also very lovable.",
+  "very funny. unfortunately also an excellent friend.",
   "your humor should probably require a licence",
   "extremely sweet, unfortunately also extremely silly",
   "somehow both adorable and a menace",
