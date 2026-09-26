@@ -381,7 +381,7 @@ function HandArt({
 
       <ellipse cx="186" cy="322" rx="48" ry="6" fill="#5b4450" opacity="0.1" />
 
-      <g filter={`url(#${id}-outline)`} fill={skin}>
+      <g filter={`url(#${id}-outline)`} fill={skin} pointerEvents="none">
         {FINGERS.filter((f) => f.i !== 0)
           .slice()
           .reverse()
@@ -425,40 +425,48 @@ function HandArt({
           <clipPath id={`${id}-clip-${f.i}`}>
             <path d={nailPath(design.shape, nailW, nailH)} />
           </clipPath>
-          <path d={nailPath(design.shape, nailW + 1.8, nailH + 1.4)} fill="#e7b9a0" opacity="0.7" />
+          <g pointerEvents="none">
+            <path d={nailPath(design.shape, nailW + 1.8, nailH + 1.4)} fill="#e7b9a0" opacity="0.7" />
+            <path
+              d={nailPath(design.shape, nailW, nailH)}
+              fill={`url(#${id}-polish)`}
+              stroke="#b8867a"
+              strokeWidth="1.15"
+            />
+            <g clipPath={`url(#${id}-clip-${f.i})`}>
+              {design.chrome && <path d={nailPath(design.shape, nailW, nailH)} fill={`url(#${id}-chrome)`} />}
+              {design.glitter &&
+                GLITTER.map(([gx, gy], gi) => (
+                  <circle
+                    key={`${gx}-${gy}`}
+                    cx={(gx / 100 - 0.5) * nailW}
+                    cy={-(gy / 100) * nailH}
+                    r={gi % 3 === 0 ? 1.7 : 1.1}
+                    fill="#fff"
+                    opacity={gi % 2 ? 0.9 : 0.65}
+                    className="anim-twinkle"
+                    style={{ animationDelay: `${gi * 0.22}s` }}
+                  />
+                ))}
+              <ellipse cx={-nailW * 0.2} cy={-nailH * 0.7} rx={nailW * 0.16} ry={nailH * 0.16} fill="#fff" opacity="0.5" />
+              <ellipse cx="0" cy={-1.5} rx={nailW * 0.26} ry={2.6} fill="#fff" opacity="0.32" />
+            </g>
+          </g>
           <path
             d={nailPath(design.shape, nailW, nailH)}
-            fill={`url(#${id}-polish)`}
-            stroke="#b8867a"
-            strokeWidth="1.15"
+            fill="none"
+            pointerEvents="all"
             className="cursor-pointer"
             onClick={(e) => {
               const ctm = e.currentTarget.getScreenCTM()
-              if (!ctm) return
-              const local = new DOMPoint(e.clientX, e.clientY).matrixTransform(ctm.inverse())
+              const local = ctm
+                ? new DOMPoint(e.clientX, e.clientY).matrixTransform(ctm.inverse())
+                : { x: 0, y: -nailH * 0.45 }
               const px = Math.max(12, Math.min(88, 50 + (local.x / nailW) * 100))
               const py = Math.max(10, Math.min(90, (-local.y / nailH) * 100))
               onPlace(f.i, px, py)
             }}
           />
-          <g clipPath={`url(#${id}-clip-${f.i})`}>
-            {design.chrome && <path d={nailPath(design.shape, nailW, nailH)} fill={`url(#${id}-chrome)`} />}
-            {design.glitter &&
-              GLITTER.map(([gx, gy], gi) => (
-                <circle
-                  key={`${gx}-${gy}`}
-                  cx={(gx / 100 - 0.5) * nailW}
-                  cy={-(gy / 100) * nailH}
-                  r={gi % 3 === 0 ? 1.7 : 1.1}
-                  fill="#fff"
-                  opacity={gi % 2 ? 0.9 : 0.65}
-                  className="anim-twinkle"
-                  style={{ animationDelay: `${gi * 0.22}s` }}
-                />
-              ))}
-            <ellipse cx={-nailW * 0.2} cy={-nailH * 0.7} rx={nailW * 0.16} ry={nailH * 0.16} fill="#fff" opacity="0.5" />
-            <ellipse cx="0" cy={-1.5} rx={nailW * 0.26} ry={2.6} fill="#fff" opacity="0.32" />
-          </g>
           {design.charms
             .filter((c) => c.nailIndex === f.i)
             .map((c) => (
