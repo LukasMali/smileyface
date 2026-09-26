@@ -172,7 +172,7 @@ export function ShelfRevenge() {
                   notify("the shelf requested a rematch")
                 }}
               >
-                rematch (it asked for it)
+                rematch it asked for it
               </GameButton>
             </Panel>
           )}
