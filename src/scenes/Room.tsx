@@ -301,7 +301,7 @@ export function Room() {
           testid="mouse"
           onClick={() => {
             play("sparkle")
-            discoverSecret("desk-mouse", "the mouse knows things")
+            discoverSecret("desk-mouse", "the mouse did a little spin. professional.")
           }}
         >
           <span className="mb-0.5 block h-[24px] w-[16px] sm:h-11 sm:w-8">

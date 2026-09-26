@@ -134,10 +134,10 @@ export function Nails() {
 
   const density = design.charms.length + (design.glitter ? 2 : 0) + (design.chrome ? 2 : 0) + design.length
   const rating = useMemo(() => {
-    if (density >= 22) return { stars: 5, text: "airport security has questions. correct answer: yes." }
+    if (density >= 22) return { stars: 5, text: "so sparkly the stars asked for an autograph" }
     if (density >= 16) return { stars: 5, text: "maximum charm density achieved" }
-    if (density >= 11) return { stars: 4, text: "dangerously sparkly. proceed." }
-    if (density >= 7) return { stars: 3, text: "very sparkly, still room for crimes" }
+    if (density >= 11) return { stars: 4, text: "sparkle overload. gorgeous." }
+    if (density >= 7) return { stars: 3, text: "very sparkly. still room for one more charm" }
     return { stars: 2, text: "sparkly (subtle is not available here)" }
   }, [density])
 

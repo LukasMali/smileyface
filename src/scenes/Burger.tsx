@@ -83,7 +83,7 @@ export function Burger() {
           {stack.length >= 6 && (
             <div className="absolute right-2 bottom-2 z-20 text-right">
               <Nikki pose="sit" size={86} />
-              <p className="font-hand text-xs text-ink-soft">…staring</p>
+              <p className="font-hand text-xs text-ink-soft">very invested</p>
             </div>
           )}
         </Panel>
@@ -114,7 +114,7 @@ export function Burger() {
             <GameButton
               tone="mint"
               onClick={() => {
-                notify("Nini has inspected the burger. approved (worryingly).")
+                notify("Nini has inspected the burger. approved. extra pats recommended.")
                 play("bark")
               }}
             >

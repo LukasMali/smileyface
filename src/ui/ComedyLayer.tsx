@@ -30,7 +30,7 @@ const LINES: Record<Kind, string> = {
   "nini-blanket": "Nini unionized the blankets. they won immediately",
   "fruit-escape": "a strawberry packed a tiny lunch and made a break for it",
   "burger-fall": "the burger fainted from how good it looked. get well soon",
-  "mystery-fish": "rare fish spotted. it knows your wifi password and will not tell",
+  "mystery-fish": "rare fish spotted. it brought you a tiny bubble kiss",
 }
 
 export function ComedyLayer() {

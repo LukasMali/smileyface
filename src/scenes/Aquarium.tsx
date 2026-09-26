@@ -146,7 +146,7 @@ export function Aquarium() {
       seen.current.add(f.id)
       patch((s) => ({ ...s, collectedFish: [...new Set([...s.collectedFish, f.id])] }))
     }
-    if (f.hidden) discoverSecret("hidden-fish", "tiny void fish located")
+    if (f.hidden) discoverSecret("hidden-fish", "shy little fish found. it was hiding for the bit")
     if (seen.current.size >= 7 && !save.completedLevels.includes("aquarium")) completeLevel("aquarium")
   }
 
@@ -246,7 +246,7 @@ export function Aquarium() {
 
       <Panel className="mx-auto mt-3 max-w-3xl bg-white/85">
         <p className="font-hand text-sm">
-          inspected {save.collectedFish.length}/8 · one of them is barely visible and knows it
+          inspected {save.collectedFish.length}/8 · one of them is barely visible and very shy about it
         </p>
       </Panel>
     </PageShell>

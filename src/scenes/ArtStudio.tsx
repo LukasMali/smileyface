@@ -245,7 +245,7 @@ export function ArtStudio() {
     snapshot()
     ctx.fillStyle = PAPER
     ctx.fillRect(0, 0, CW, CH)
-    notify("blank paper. slightly threatening")
+    notify("blank paper. a tiny adventure waiting")
     persistArt()
   }
 
